@@ -76,7 +76,7 @@ void LTM_start (Match* m, MStr_t str) {
 		case MALT:       return LTM_start_MAlt(m, str);
 		case MREPMAX:    return LTM_start_MRepMax(m, str);
 		default: {
-			fprintf(stderr, "Error: Tried to associate unknown match type %d.\n", m->type);
+			fprintf(stderr, "Error: Tried to match with unknown match type %d.\n", m->type);
 			abort();
 		}
 	}
