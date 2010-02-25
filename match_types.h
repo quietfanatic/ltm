@@ -13,6 +13,7 @@
 #ifndef MStr_t
 #define MStr_t MChar_t* // default: zero-padded string of MChar_t
 #define MStr_at(str, i) ((str)[i])
+#define MStr_beginat(str, i) ((i) == 0)
 #define MStr_endat(str, i) ((str)[i] == 0)
 #endif
 
