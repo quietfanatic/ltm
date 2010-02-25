@@ -45,8 +45,8 @@ MSpec create_MCharClass (int nranges, char* ranges) {
 	MSpec r;
 	r.type              = MCHARCLASS;
 	r.CharClass.nranges = nranges;
-	r.CharClass.ranges  = malloc(nranges * sizeof(struct MSpecCharRange));
-	memcpy(r.CharClass.ranges, ranges, nranges * sizeof(struct MSpecCharRange));
+	r.CharClass.ranges  = malloc(nranges * sizeof(struct MCharRange));
+	memcpy(r.CharClass.ranges, ranges, nranges * sizeof(struct MCharRange));
 	return r;
 }
 

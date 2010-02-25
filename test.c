@@ -89,7 +89,9 @@ void printmatch (Match m) {
 
 
 void test_match (MSpec spec, char* str, int start, const char* comparison) {
-	Match m = make_match(&spec, str, start);
+	Match m;
+	LTM_init_Match(&m, &spec, start);
+	LTM_start(&m, str);
 	printmatch(m);
 	printf("\n");
 	puts(comparison);
@@ -220,7 +222,7 @@ int main() {
 	MSpec t20;
 	 t20.type                = MCHARCLASS;
 	 t20.CharClass.nranges   = 2;
-	 t20.CharClass.ranges    = malloc(2 * sizeof(struct MSpecCharRange));
+	 t20.CharClass.ranges    = malloc(2 * sizeof(struct MCharRange));
 	 t20.CharClass.ranges[0].from = 'a';
 	 t20.CharClass.ranges[0].to   = 'a';
 	 t20.CharClass.ranges[1].from = 'c';
