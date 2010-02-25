@@ -5,7 +5,7 @@
 
 
 void backtrack (Match* m, MStr_t str);
-Match make_match (MSpec* m, MStr_t str, size_t start);
+void LTM_init_Match(Match* m, MSpec* spec, size_t start);
 void LTM_start (Match* m, MStr_t str);
 
 void die (char* mess) {
@@ -55,16 +55,14 @@ void backtrack (Match* m, MStr_t str) {
 
 
 
-Match make_match (MSpec* spec, MStr_t str, size_t start) {
-	Match m;
-	 m.type  = spec->type;
-	 m.spec  = spec;
-	 m.start = start;
-	LTM_start(&m, str);
-	return m;
+inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
+	m->type  = spec->type;
+	m->spec  = spec;
+	m->start = start;
+	return;
 }
 
-inline void LTM_start (Match* m, MStr_t str) {
+void LTM_start (Match* m, MStr_t str) {
 	switch (m->type) {
 		case NOMATCH:    return LTM_start_NoMatch(m, str);
 		case MNULL:      return LTM_start_MNull(m, str);

@@ -24,9 +24,8 @@ static inline void walk_repmax (Match* m, MStr_t str) {
 			m->Rep.nmatches++;
 			m->Rep.matches = realloc(m->Rep.matches, m->Rep.nmatches * sizeof(Match));
 			if (!m->Rep.matches) die("Could not realloc m->Rep.matches");
-			m->Rep.matches[m->Rep.nmatches-1] = make_match(
-				m->spec->Rep.child, str, m->Rep.matches[m->Rep.nmatches-2].end
-			);
+			LTM_init_Match(&m->Rep.matches[m->Rep.nmatches-1], m->spec->Rep.child, m->Rep.matches[m->Rep.nmatches-2].end);
+			LTM_start(&m->Rep.matches[m->Rep.nmatches-1], str);
 		}
 	}
 }
@@ -35,7 +34,8 @@ inline void LTM_start_MRepMax (Match* m, MStr_t str) {
 	m->Rep.nmatches   = 1;
 	m->Rep.matches    = malloc(sizeof(Match));
 	if (!m->Rep.matches) die("Could not malloc m.Rep.matches");
-	m->Rep.matches[0] = make_match(m->spec->Rep.child, str, m->start);
+	LTM_init_Match(&m->Rep.matches[0], m->spec->Rep.child, m->start);
+	LTM_start(&m->Rep.matches[0], str);
 	walk_repmax(m, str);
 	return;
 }

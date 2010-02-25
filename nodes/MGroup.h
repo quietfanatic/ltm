@@ -19,7 +19,8 @@ static inline void walk_group_from (Match* m, MStr_t str, size_t i) {
 				m->end = m->Group.elements[i-1].end;
 				return;
 			}
-			m->Group.elements[i] = make_match(&m->spec->Group.elements[i], str, m->Group.elements[i-1].end);
+			LTM_init_Match(&m->Group.elements[i], &m->spec->Group.elements[i], m->Group.elements[i-1].end);
+			LTM_start(&m->Group.elements[i], str);
 		}
 	}
 }
@@ -43,7 +44,8 @@ inline void LTM_start_MGroup (Match* m, MStr_t str) {
 	}
 	m->Group.elements = malloc(m->Group.nelements * sizeof(Match));
 	if (!m->Group.elements) die("Could not malloc m.Group.elements");
-	m->Group.elements[0] = make_match(&m->spec->Group.elements[0], str, m->start);
+	LTM_init_Match(&m->Group.elements[0], &m->spec->Group.elements[0], m->start);
+	LTM_start(&m->Group.elements[0], str);
 	walk_group_from(m, str, 0);
 	return;
 }
