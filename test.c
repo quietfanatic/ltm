@@ -75,6 +75,18 @@ void printmatch (Match m) {
 			printf(")[%d..%d]", m.start, m.end);
 			return;
 		}
+		case MSCOPE: {
+			printf("MScope(");
+			printmatch(*m.Scope.child);
+			printf(")[%d..%d]", m.start, m.end);
+			return;
+		}
+		case MCAP: {
+			printf("MCap(");
+			printmatch(*m.Scope.child);
+			printf(")[%d..%d]", m.start, m.end);
+			return;
+		}
 		case MALT: {
 			printf("MAlt(");
 			printmatch(*m.Alt.matched);
@@ -89,14 +101,14 @@ void printmatch (Match m) {
 }
 
 
-void test_match (MSpec spec, char* str, int start, const char* comparison) {
+Match test_match (MSpec spec, char* str, int start, const char* comparison) {
 	Match m;
 	LTM_init_Match(&m, &spec, start);
 	LTM_start(&m, str, NULL);
 	printmatch(m);
-	destroy_match(m);
 	printf("\n");
 	puts(comparison);
+	return m;
 };
 
 int main(int argv, char** argc) {
@@ -234,6 +246,23 @@ int main(int argv, char** argc) {
 	test_match(t20, teststr, 1, "NoMatch");
 	printf("t22\n"); // Character class match
 	test_match(t20, teststr, 2, "MCharClass(ac..g)[2..3]");
+	printf("t23\n"); // Scope and Capture
+	MSpec t23c;
+	 t23c.type = MCAP;
+	 t23c.Cap.id = 0;
+	 t23c.Cap.child = &t3;
+	MSpec t23;
+	 t23.type = MSCOPE;
+	 t23.Scope.ncaps = 1;
+	 t23.Scope.nnamecaps = 0;
+	 t23.Scope.child = &t23c;
+	Match t23r;
+	t23r = test_match(t23, teststr, 0, "MScope(MCap(MChar(a)[0..1])[0..1])[0..1]");
+	if (t23r.Scope.caps[0] == t23r.Scope.child)
+		printf("Capture succeeded\n");
+	else
+		printf("Capture failed: %08x != %08x\n", t23r.Scope.caps[0], t23r.Scope.child);
+
 	 // cleanup.
 	printf("freeing...\n");
 	free(t20.CharClass.ranges);

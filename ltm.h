@@ -30,6 +30,7 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 #include "nodes/MRep.h"
 #include "nodes/MAlt.h"
 #include "nodes/MScope.h"
+#include "nodes/MCap&co.h"
 
 // On match success:
 //     DEBUGLOG()
@@ -63,6 +64,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MALT:       return LTM_start_MAlt(m, str, scope);
 		case MREPMAX:    return LTM_start_MRepMax(m, str, scope);
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
+		case MCAP:       return LTM_start_MCap(m, str, scope);
 		default: {
 			fprintf(stderr, "Error: Tried to match with unknown match type %d.\n", m->type);
 			abort();

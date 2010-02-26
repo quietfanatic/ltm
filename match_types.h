@@ -172,6 +172,10 @@ struct MatchCap { MATCH_STRUCT_COMMON
 struct MatchNameCap { MATCH_STRUCT_COMMON
 	struct Match* child;
 };
+struct MatchMultiCap { MATCH_STRUCT_COMMON
+	size_t nplaces;
+	struct Match** places;
+};
 
 typedef struct Match {
 	union {
@@ -190,6 +194,7 @@ typedef struct Match {
 		struct MatchScope Scope;
 		struct MatchCap Cap;
 		struct MatchNameCap NameCap;
+		struct MatchMultiCap MultiCap;
 	};
 } Match;
 
