@@ -1,8 +1,8 @@
 static inline void LTM_destroy_MScope_MultiCaps (Match* m) {
 	int i;
-	for (i=0; i < m->spec.ncaps + m->spec.nnamecaps; i++) {
-		if (m->caps[i]->type == MMULTICAP)
-			free(m->caps[i]);
+	for (i=0; i < m->spec->Scope.ncaps + m->spec->Scope.nnamecaps; i++) {
+		if (m->Scope.caps[i]->type == MMULTICAP)
+			free(m->Scope.caps[i]);
 	}
 	return;
 }
@@ -32,18 +32,18 @@ static inline void LTM_start_MScope (Match* m, MStr_t str, Match* scope) {
 		return LTM_fail_MScope(m);
 	}
 	DEBUGLOG(" ## Matching MScope\n");
-	m->start = m->child->end;
+	m->start = m->Scope.child->end;
 	return;
 }
 
 static inline void LTM_backtrack_MScope (Match* m, MStr_t str, Match* scope) {
-	LTM_backtrack(m->child, str, m);  // in this scope
+	LTM_backtrack(m->Scope.child, str, m);  // in this scope
 	if (m->Scope.child->type == NOMATCH) {
 		DEBUGLOG(" ## Not matching MScope\n");
 		return LTM_fail_MScope(m);
 	}
 	DEBUGLOG(" ## Matching MScope\n");
-	m->start = m->child->end;
+	m->start = m->Scope.child->end;
 	return;
 }
 

@@ -9,7 +9,7 @@ static inline void LTM_succeed_MRep (Match* m) {
 	return;
 }
 
-static inline void LTM_walk_MRep (Match* m, MStr_t str) {
+static inline void LTM_walk_MRep (Match* m, MStr_t str, Match* scope) {
 	for (;;) {  // If child didn't match, backtrack left
 		if (m->Rep.matches[m->Rep.nmatches-1].type == NOMATCH) {
 			if (m->Rep.nmatches == 0) {  // All the way left
@@ -21,7 +21,7 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str) {
 				DEBUGLOG(" ## Matching MRepMax (enough matches)\n");
 				return LTM_succeed_MRep(m);
 			}
-			LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str);
+			LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str, scope);
 		}  // If child did match, advance right
 		else {
 			if (m->Rep.nmatches == m->spec->Rep.max) {  // We're all full
@@ -32,12 +32,12 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str) {
 			m->Rep.matches = realloc(m->Rep.matches, m->Rep.nmatches * sizeof(Match));
 			if (!m->Rep.matches) die("Could not realloc m->Rep.matches");
 			LTM_init_Match(&m->Rep.matches[m->Rep.nmatches-1], m->spec->Rep.child, m->Rep.matches[m->Rep.nmatches-2].end);
-			LTM_start(&m->Rep.matches[m->Rep.nmatches-1], str);
+			LTM_start(&m->Rep.matches[m->Rep.nmatches-1], str, scope);
 		}
 	}
 }
 
-static inline void LTM_start_MRepMax (Match* m, MStr_t str) {
+static inline void LTM_start_MRepMax (Match* m, MStr_t str, Match* scope) {
 	if (m->spec->Rep.max == 0) {  // Why do you want to repeat 0 times?
 		DEBUGLOG(" ## Matching MRepMax (as null)\n");
 		m->end = m->start;
@@ -48,19 +48,19 @@ static inline void LTM_start_MRepMax (Match* m, MStr_t str) {
 	m->Rep.matches    = malloc(sizeof(Match));
 	if (!m->Rep.matches) die("Could not malloc m->Rep.matches");
 	LTM_init_Match(&m->Rep.matches[0], m->spec->Rep.child, m->start);
-	LTM_start(&m->Rep.matches[0], str);
-	LTM_walk_MRep(m, str);
+	LTM_start(&m->Rep.matches[0], str, scope);
+	LTM_walk_MRep(m, str, scope);
 	return;
 }
 
 
-static inline void LTM_backtrack_MRepMax (Match* m, MStr_t str) {
+static inline void LTM_backtrack_MRepMax (Match* m, MStr_t str, Match* scope) {
 	if (m->Rep.nmatches == 0) {
 		DEBUGLOG(" ## Not matching MRepMax\n");
 		return LTM_fail_MRep(m);
 	}
-	LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str);
-	LTM_walk_MRep(m, str);
+	LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str, scope);
+	LTM_walk_MRep(m, str, scope);
 	return;
 }
 

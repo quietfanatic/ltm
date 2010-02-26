@@ -44,6 +44,7 @@ enum Match_type {
 	MSCOPE,
 	MCAP,
 	MNAMECAP,
+	MMULTICAP,
 };
 typedef uint8_t Match_type;
 
@@ -162,14 +163,14 @@ struct MatchRep { MATCH_STRUCT_COMMON
 	struct Match* matches;
 };
 struct MatchScope { MATCH_STRUCT_COMMON
-	struct MSpec* child;
-	struct MSpec* caps; // Numbered Caps first, then Named Caps.
+	struct Match* child;
+	struct Match** caps; // Numbered Caps first, then Named Caps.
 };
 struct MatchCap { MATCH_STRUCT_COMMON
-	struct MSpec* child;
+	struct Match* child;
 };
 struct MatchNameCap { MATCH_STRUCT_COMMON
-	struct MSpec* child;
+	struct Match* child;
 };
 
 typedef struct Match {

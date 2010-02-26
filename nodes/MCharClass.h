@@ -1,5 +1,5 @@
 
-static inline void LTM_start_MCharClass (Match* m, MStr_t str) {
+static inline void LTM_start_MCharClass (Match* m, MStr_t str, Match* scope) {
 	int i;  // Ranges must be sorted to work.
 	for (i=0; i < m->spec->CharClass.nranges; i++) {
 		if (MStr_at(str, m->start) < m->spec->CharClass.ranges[i].from) {

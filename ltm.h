@@ -4,15 +4,21 @@
 #define DEBUGLOG(x) //(fprintf(stderr, x))
 
 
-void LTM_backtrack (Match* m, MStr_t str);
-void LTM_init_Match(Match* m, MSpec* spec, size_t start);
-void LTM_start (Match* m, MStr_t str);
+static inline void LTM_init_Match(Match* m, MSpec* spec, size_t start);
+void LTM_start (Match* m, MStr_t str, Match* scope);
+void LTM_backtrack (Match* m, MStr_t str, Match* scope);
 
 void die (char* mess) {
 	fputs(mess, stderr);
 	abort();
 }
 
+static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
+	m->type  = spec->type;
+	m->spec  = spec;
+	m->start = start;
+	return;
+}
 
 #include "nodes/NoMatch.h"
 #include "nodes/MAny.h"
@@ -23,6 +29,7 @@ void die (char* mess) {
 #include "nodes/MOpt.h"
 #include "nodes/MRep.h"
 #include "nodes/MAlt.h"
+#include "nodes/MScope.h"
 
 // On match success:
 //     DEBUGLOG()
@@ -38,43 +45,24 @@ void die (char* mess) {
 
 
 
-void LTM_backtrack (Match* m, MStr_t str) {
+
+
+
+
+void LTM_start (Match* m, MStr_t str, Match* scope) {
 	switch (m->type) {
-		case NOMATCH: return LTM_backtrack_NoMatch(m, str);
-		case MGROUP: return LTM_backtrack_MGroup(m, str);
-		case MOPT: return LTM_backtrack_MOpt(m, str);
-		case MALT: return LTM_backtrack_MAlt(m, str);
-		case MREPMAX: return LTM_backtrack_MRepMax(m, str);
-		default: {
-			DEBUGLOG(" ## Backtracking past a token\n");
-			m->type = NOMATCH;
-			return;
-		}
-	}
-}
-
-
-
-inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
-	m->type  = spec->type;
-	m->spec  = spec;
-	m->start = start;
-	return;
-}
-
-void LTM_start (Match* m, MStr_t str) {
-	switch (m->type) {
-		case NOMATCH:    return LTM_start_NoMatch(m, str);
-		case MNULL:      return LTM_start_MNull(m, str);
-		case MBEGIN:     return LTM_start_MBegin(m, str);
-		case MEND:       return LTM_start_MEnd(m, str);
-		case MANY:       return LTM_start_MAny(m, str);
-		case MCHAR:      return LTM_start_MChar(m, str);
-		case MCHARCLASS: return LTM_start_MCharClass(m, str);
-		case MGROUP:     return LTM_start_MGroup(m, str);
-		case MOPT:       return LTM_start_MOpt(m, str);
-		case MALT:       return LTM_start_MAlt(m, str);
-		case MREPMAX:    return LTM_start_MRepMax(m, str);
+		case NOMATCH:    return LTM_start_NoMatch(m, str, scope);
+		case MNULL:      return LTM_start_MNull(m, str, scope);
+		case MBEGIN:     return LTM_start_MBegin(m, str, scope);
+		case MEND:       return LTM_start_MEnd(m, str, scope);
+		case MANY:       return LTM_start_MAny(m, str, scope);
+		case MCHAR:      return LTM_start_MChar(m, str, scope);
+		case MCHARCLASS: return LTM_start_MCharClass(m, str, scope);
+		case MGROUP:     return LTM_start_MGroup(m, str, scope);
+		case MOPT:       return LTM_start_MOpt(m, str, scope);
+		case MALT:       return LTM_start_MAlt(m, str, scope);
+		case MREPMAX:    return LTM_start_MRepMax(m, str, scope);
+		case MSCOPE:     return LTM_start_MScope(m, str, scope);
 		default: {
 			fprintf(stderr, "Error: Tried to match with unknown match type %d.\n", m->type);
 			abort();
@@ -83,6 +71,21 @@ void LTM_start (Match* m, MStr_t str) {
 }
 
 
+void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
+	switch (m->type) {
+		case NOMATCH: return LTM_backtrack_NoMatch(m, str, scope);
+		case MGROUP: return LTM_backtrack_MGroup(m, str, scope);
+		case MOPT: return LTM_backtrack_MOpt(m, str, scope);
+		case MALT: return LTM_backtrack_MAlt(m, str, scope);
+		case MREPMAX: return LTM_backtrack_MRepMax(m, str, scope);
+		case MSCOPE: return LTM_backtrack_MScope(m, str, scope);
+		default: {
+			DEBUGLOG(" ## Backtracking past a token\n");
+			m->type = NOMATCH;
+			return;
+		}
+	}
+}
 
 
 

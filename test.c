@@ -92,7 +92,7 @@ void printmatch (Match m) {
 void test_match (MSpec spec, char* str, int start, const char* comparison) {
 	Match m;
 	LTM_init_Match(&m, &spec, start);
-	LTM_start(&m, str);
+	LTM_start(&m, str, NULL);
 	printmatch(m);
 	destroy_match(m);
 	printf("\n");
