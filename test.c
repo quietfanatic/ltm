@@ -262,6 +262,13 @@ int main(int argv, char** argc) {
 		printf("Capture succeeded\n");
 	else
 		printf("Capture failed: %08x != %08x\n", t23r.Scope.caps[0], t23r.Scope.child);
+	printf("t24\n");
+	t23c.Cap.child = &t4;
+	t23r = test_match(t23, teststr, 0, "NoMatch");
+	if (t23r.Scope.caps[0] == NULL)
+		printf("Non-capture succeeded\n");
+	else
+		printf("Non-capture failed: %08x != 00000000\n", t23r.Scope.caps[0]);
 
 	 // cleanup.
 	printf("freeing...\n");
