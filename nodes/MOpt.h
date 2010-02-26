@@ -1,4 +1,5 @@
 
+
 inline void LTM_start_MOpt (Match* m, MStr_t str) {
 	m->Opt.possible = malloc(sizeof(Match));
 	if (!m->Opt.possible) die("Could not malloc m.Opt.elements");
@@ -17,9 +18,15 @@ inline void LTM_start_MOpt (Match* m, MStr_t str) {
 }
 
 inline void LTM_backtrack_MOpt (Match* m, MStr_t str) {
-	DEBUGLOG(" ## Matching MOpt (as null)\n");
-	free(m->Opt.possible);
-	m->end = m->start;
-	m->type = MNULL;
+	LTM_backtrack(m->Opt.possible, str);
+	if (m->Opt.possible->type == NOMATCH) {
+		DEBUGLOG(" ## Matching MOpt (as null)\n");
+		free(m->Opt.possible);
+		m->end = m->start;
+		m->type = MNULL;
+		return;
+	}
+	DEBUGLOG(" ## Matching MOpt\n");
+	m->end = m->Opt.possible->end;
 	return;
 }
