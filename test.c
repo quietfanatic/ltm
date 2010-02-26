@@ -1,5 +1,6 @@
 #include "ltm.h"
 #include <stdio.h>
+#include "construction.h"
 
 void printmatch (Match m) {
 	switch (m.type) {
@@ -93,11 +94,12 @@ void test_match (MSpec spec, char* str, int start, const char* comparison) {
 	LTM_init_Match(&m, &spec, start);
 	LTM_start(&m, str);
 	printmatch(m);
+	destroy_match(m);
 	printf("\n");
 	puts(comparison);
 };
 
-int main() {
+int main(int argv, char** argc) {
 	char* teststr = "abc";
 	char* emptystr = "";
 	printf("t1\n"); // MAny match
@@ -232,6 +234,25 @@ int main() {
 	test_match(t20, teststr, 1, "NoMatch");
 	printf("t22\n"); // Character class match
 	test_match(t20, teststr, 2, "MCharClass(ac..g)[2..3]");
+	 // cleanup.
+	printf("freeing...\n");
+	free(t20.CharClass.ranges);
+	printf("t20\n");
+	free(t19.Group.elements);
+	printf("t19\n");
+	free(t16.Alt.alts);
+	printf("t16\n");
+	free(t15.Group.elements);
+	printf("t15\n");
+	free(t11.Group.elements);
+	printf("t11\n");
+	free(t7.Group.elements);
+	printf("t7\n");
+	free(t7i.Group.elements);
+	printf("t7i\n");
+	free(t5.Group.elements);
+	printf("t5\n");
+	if (argv > 1) getc(stdin);
 	return 0;
 }
 
