@@ -4,7 +4,7 @@
 #define DEBUGLOG(x) //(fprintf(stderr, x))
 
 
-void backtrack (Match* m, MStr_t str);
+void LTM_backtrack (Match* m, MStr_t str);
 void LTM_init_Match(Match* m, MSpec* spec, size_t start);
 void LTM_start (Match* m, MStr_t str);
 
@@ -38,7 +38,7 @@ void die (char* mess) {
 
 
 
-void backtrack (Match* m, MStr_t str) {
+void LTM_backtrack (Match* m, MStr_t str) {
 	switch (m->type) {
 		case NOMATCH: return LTM_backtrack_NoMatch(m, str);
 		case MGROUP: return LTM_backtrack_MGroup(m, str);

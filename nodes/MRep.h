@@ -21,7 +21,7 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str) {
 				DEBUGLOG(" ## Matching MRepMax (enough matches)\n");
 				return LTM_succeed_MRep(m);
 			}
-			backtrack(&m->Rep.matches[m->Rep.nmatches-1], str);
+			LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str);
 		}  // If child did match, advance right
 		else {
 			if (m->Rep.nmatches == m->spec->Rep.max) {  // We're all full
@@ -59,7 +59,7 @@ inline void LTM_backtrack_MRepMax (Match* m, MStr_t str) {
 		DEBUGLOG(" ## Not matching MRepMax\n");
 		return LTM_fail_MRep(m);
 	}
-	backtrack(&m->Rep.matches[m->Rep.nmatches-1], str);
+	LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str);
 	LTM_walk_MRep(m, str);
 	return;
 }

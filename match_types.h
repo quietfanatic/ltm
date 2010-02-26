@@ -158,8 +158,8 @@ struct MatchOpt { MATCH_STRUCT_COMMON
 	struct Match* possible;
 };
 struct MatchRep { MATCH_STRUCT_COMMON
-			size_t nmatches;
-			struct Match* matches;
+	size_t nmatches;
+	struct Match* matches;
 };
 struct MatchScope { MATCH_STRUCT_COMMON
 	struct MSpec* child;

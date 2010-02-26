@@ -19,7 +19,7 @@ static inline void LTM_walk_MGroup (Match* m, MStr_t str, size_t i) {
 				return LTM_fail_MGroup(m);
 			}
 			i--;
-			backtrack(&(m->Group.elements[i]), str);
+			LTM_backtrack(&(m->Group.elements[i]), str);
 		}  // If element did match, advance right
 		else {
 			i++;
@@ -54,7 +54,7 @@ inline void LTM_backtrack_MGroup (Match* m, MStr_t str) {
 		m->type = NOMATCH;
 		return;
 	}
-	backtrack(&m->Group.elements[m->spec->Group.nelements-1], str);  // Backtrack one element
+	LTM_backtrack(&m->Group.elements[m->spec->Group.nelements-1], str);  // Backtrack one element
 	LTM_walk_MGroup(m, str, m->spec->Group.nelements-1);
 	return;
 }
