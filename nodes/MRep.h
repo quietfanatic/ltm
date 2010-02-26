@@ -37,7 +37,7 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str) {
 	}
 }
 
-inline void LTM_start_MRepMax (Match* m, MStr_t str) {
+static inline void LTM_start_MRepMax (Match* m, MStr_t str) {
 	if (m->spec->Rep.max == 0) {  // Why do you want to repeat 0 times?
 		DEBUGLOG(" ## Matching MRepMax (as null)\n");
 		m->end = m->start;
@@ -54,7 +54,7 @@ inline void LTM_start_MRepMax (Match* m, MStr_t str) {
 }
 
 
-inline void LTM_backtrack_MRepMax (Match* m, MStr_t str) {
+static inline void LTM_backtrack_MRepMax (Match* m, MStr_t str) {
 	if (m->Rep.nmatches == 0) {
 		DEBUGLOG(" ## Not matching MRepMax\n");
 		return LTM_fail_MRep(m);

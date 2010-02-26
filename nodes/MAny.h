@@ -1,5 +1,5 @@
 
-inline void LTM_start_MAny (Match* m, MStr_t str) {
+static inline void LTM_start_MAny (Match* m, MStr_t str) {
 	if (MStr_endat(str, m->start)) {  // Fails only at end of string
 		DEBUGLOG(" ## Not matching MAny (end of string)\n");
 		m->type = NOMATCH;

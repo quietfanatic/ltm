@@ -1,4 +1,4 @@
-static_inline void LTM_destroy_MScope_MultiCaps (Match* m) {
+static inline void LTM_destroy_MScope_MultiCaps (Match* m) {
 	int i;
 	for (i=0; i < m->spec.ncaps + m->spec.nnamecaps; i++) {
 		if (m->caps[i]->type == MMULTICAP)
@@ -17,7 +17,7 @@ static inline void LTM_fail_MScope (Match* m) {
 
 
 
-inline void LTM_start_MScope (Match* m, MStr_t str, Match* scope) {
+static inline void LTM_start_MScope (Match* m, MStr_t str, Match* scope) {
 	m->Scope.child = malloc(sizeof(Match));
 	if (!m->Scope.child) die("Could not malloc m->Scope.child.\n");
 	m->Scope.caps = malloc(
@@ -36,7 +36,7 @@ inline void LTM_start_MScope (Match* m, MStr_t str, Match* scope) {
 	return;
 }
 
-inline void LTM_backtrack_MScope (Match* m, MStr_t str, Match* scope) {
+static inline void LTM_backtrack_MScope (Match* m, MStr_t str, Match* scope) {
 	LTM_backtrack(m->child, str, m);  // in this scope
 	if (m->Scope.child->type == NOMATCH) {
 		DEBUGLOG(" ## Not matching MScope\n");

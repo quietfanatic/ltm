@@ -33,7 +33,7 @@ static inline void LTM_walk_MGroup (Match* m, MStr_t str, size_t i) {
 	}
 }
 
-inline void LTM_start_MGroup (Match* m, MStr_t str) {
+static inline void LTM_start_MGroup (Match* m, MStr_t str) {
 	m->Group.nelements = m->spec->Group.nelements;
 	if (m->spec->Group.nelements == 0) {  // Empty group
 		DEBUGLOG(" ## Matching MGroup (as null)\n");
@@ -49,7 +49,7 @@ inline void LTM_start_MGroup (Match* m, MStr_t str) {
 	return;
 }
 
-inline void LTM_backtrack_MGroup (Match* m, MStr_t str) {
+static inline void LTM_backtrack_MGroup (Match* m, MStr_t str) {
 	if (m->spec->Group.nelements == 0) {  // Empty group
 		m->type = NOMATCH;
 		return;
