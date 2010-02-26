@@ -1,6 +1,5 @@
 #include "ltm.h"
 #include <stdio.h>
-#include "construction.h"
 
 void printmatch (Match m) {
 	switch (m.type) {
