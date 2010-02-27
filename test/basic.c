@@ -113,23 +113,23 @@ Match test_match (MSpec spec, char* str, int start, const char* comparison) {
 int main(int argv, char** argc) {
 	char* teststr = "abc";
 	char* emptystr = "";
-	printf("t1\n"); // MAny match
+	printf("t1, MAny match\n");
 	MSpec t1;
 	 t1.type = MANY;
 	test_match(t1, teststr, 0, "MAny[0..1]");
-	printf("t2\n"); // MAny fail (end of string)
+	printf("t2  MAny fail (end of string)\n");
 	test_match(t1, emptystr, 0, "NoMatch");
-	printf("t3\n"); // MChar match
+	printf("t3  MChar match\n");
 	MSpec t3;
 	 t3.type   = MCHAR;
 	 t3.Char.c = 'a';
 	test_match(t3, teststr, 0, "MChar(a)[0..1]");
-	printf("t4\n"); // MChar fail (not right char)
+	printf("t4  MChar fail (not right char)\n");
 	MSpec t4;
 	 t4.type   = MCHAR;
 	 t4.Char.c = 'c';
 	test_match(t4, teststr, 0, "NoMatch");
-	printf("t5\n"); // MGroup match (a, any, c)
+	printf("t5  MGroup match (a, any, c)\n");
 	MSpec t5;
 	 t5.type              = MGROUP;
 	 t5.Group.nelements   = 3;
@@ -138,10 +138,10 @@ int main(int argv, char** argc) {
 	 t5.Group.elements[1] = t1;
 	 t5.Group.elements[2] = t4;
 	test_match(t5, teststr, 0, "MGroup(MChar(a)[0..1], MAny[1..2], MChar(c)[2..3])[0..3]");
-	printf("t6\n"); // MGroup fail (a, any, a)
+	printf("t6  MGroup fail (a, any, a)\n");
 	 t5.Group.elements[2] = t3;
 	test_match(t5, teststr, 0, "NoMatch");
-	printf("t7\n"); // MGroup nested match ((a, any), c)
+	printf("t7  MGroup nested match ((a, any), c)\n");
 	MSpec t7i;
 	 t7i.type              = MGROUP;
 	 t7i.Group.nelements   = 2;
@@ -155,18 +155,18 @@ int main(int argv, char** argc) {
 	 t7.Group.elements[0] = t7i;
 	 t7.Group.elements[1] = t4;
 	test_match(t7, teststr, 0, "MGroup(MGroup(MChar(a)[0..1], MAny[1..2])[0..2], MChar(c)[2..3])[0..3]");
-	printf("t8\n"); // MGroup nested fail ((a, any), a)
+	printf("t8  MGroup nested fail ((a, any), a)\n");
 	 t7.Group.elements[1] = t3;
 	test_match(t7, teststr, 0, "NoMatch");
-	printf("t9\n"); // MOpt match (a)
+	printf("t9  MOpt match (a)\n");
 	MSpec t9;
 	 t9.type          = MOPT;
 	 t9.Opt.possible  = &t3;
 	test_match(t9, teststr, 0, "MOpt(MChar(a)[0..1])[0..1]");
-	printf("t10\n"); // MOpt match (null)
+	printf("t10  MOpt match (null)\n");
 	 t9.Opt.possible  = &t4;
 	test_match(t9, teststr, 0, "MNull[0..0]");
-	printf("t11\n"); // MGroup backtracking (a, opt(b), b)
+	printf("t11  MGroup backtracking (a, opt(b), b)\n");
 	 t9.Opt.possible  = &t4;
 	 t4.Char.c = 'b';
 	MSpec t11;
@@ -177,22 +177,22 @@ int main(int argv, char** argc) {
 	 t11.Group.elements[1] = t9;
 	 t11.Group.elements[2] = t4;
 	test_match(t11, teststr, 0, "MGroup(MChar(a)[0..1], MNull[1..1], MChar(b)[1..2])[0..2]");
-	printf("t12\n"); // MRepMax match 0..3
+	printf("t12  MRepMax match 0..3\n");
 	MSpec t12;
 	 t12.type      = MREPMAX;
 	 t12.Rep.child = &t1;
 	 t12.Rep.min   = 0;
 	 t12.Rep.max   = 3;
 	test_match(t12, teststr, 0, "MRepMax(MAny[0..1], MAny[1..2], MAny[2..3])[0..3]");
-	printf("t13\n"); // MRepMax match 3..*
+	printf("t13  MRepMax match 3..*\n");
 	 t12.Rep.min   = 3;
 	 t12.Rep.max   = 10000;
 	test_match(t12, teststr, 0, "MRepMax(MAny[0..1], MAny[1..2], MAny[2..3])[0..3]");
-	printf("t14\n"); // MRepMax match 0..2
+	printf("t14  MRepMax match 0..2\n");
 	 t12.Rep.min   = 0;
 	 t12.Rep.max   = 2;
 	test_match(t12, teststr, 0, "MRepMax(MAny[0..1], MAny[1..2])[0..2]");
-	printf("t15\n"); // MRepMax backtracking (any(0..2), b)
+	printf("t15  MRepMax backtracking (any(0..2), b)\n");
 	MSpec t15;
 	 t15.type              = MGROUP;
 	 t15.Group.nelements   = 2;
@@ -200,7 +200,7 @@ int main(int argv, char** argc) {
 	 t15.Group.elements[0] = t12;
 	 t15.Group.elements[1] = t4;
 	test_match(t15, teststr, 0, "MGroup(MRepMax(MAny[0..1])[0..1], MChar(b)[1..2])[0..2]");
-	printf("t16\n"); // MAlt match (c | a | any)->a
+	printf("t16  MAlt match (c | a | any)->a\n");
 	MSpec t16;
 	 t16.type        = MALT;
 	 t16.Alt.nalts   = 3;
@@ -209,14 +209,14 @@ int main(int argv, char** argc) {
 	 t16.Alt.alts[1] = t3;
 	 t16.Alt.alts[2] = t1;
 	test_match(t16, teststr, 0, "MAlt(MChar(a)[0..1])[0..1]");
-	printf("t17\n"); // MAlt backtracking (((a, any) | a | any)->a, b)
+	printf("t17  MAlt backtracking (((a, any) | a | any)->a, b)\n");
 	 t16.Alt.alts[0]       = t7i;
 	 t15.Group.elements[0] = t16;
 	test_match(t15, teststr, 0, "MGroup(MAlt(MChar(a)[0..1])[0..1], MChar(b)[1..2])[0..2]");
-	printf("t18\n"); // MAlt backtrack+fail (((a, any) | a | any), a)
+	printf("t18  MAlt backtrack+fail (((a, any) | a | any), a)\n");
 	 t15.Group.elements[1] = t3;
 	test_match(t15, teststr, 0, "NoMatch");
-	printf("t19\n"); // MBegin and MEnd match
+	printf("t19  MBegin and MEnd match\n");
 	MSpec begin;
 	 begin.type = MBEGIN;
 	MSpec end;
@@ -231,7 +231,7 @@ int main(int argv, char** argc) {
 	 t19.Group.elements[3] = t1;
 	 t19.Group.elements[4] = end;
 	test_match(t19, teststr, 0, "MGroup(MBegin[0..0], MAny[0..1], MAny[1..2], MAny[2..3], MEnd[3..3])[0..3]");
-	printf("t20\n"); // Character class match
+	printf("t20  Character class match\n");
 	MSpec t20;
 	 t20.type                = MCHARCLASS;
 	 t20.CharClass.nranges   = 2;
@@ -241,18 +241,18 @@ int main(int argv, char** argc) {
 	 t20.CharClass.ranges[1].from = 'c';
 	 t20.CharClass.ranges[1].to   = 'g';
 	test_match(t20, teststr, 0, "MCharClass(ac..g)[0..1]");
-	printf("t21\n"); // Character class fail
+	printf("t21  Character class fail\n");
 	test_match(t20, teststr, 1, "NoMatch");
-	printf("t22\n"); // Character class match
+	printf("t22  Character class match\n");
 	test_match(t20, teststr, 2, "MCharClass(ac..g)[2..3]");
-	printf("t23\n"); // Negative character class fail
+	printf("t23  Negative character class fail\n");
 	 t20.CharClass.negative = 1;
 	test_match(t20, teststr, 0, "NoMatch");
-	printf("t24\n"); // Negative character class match
+	printf("t24  Negative character class match\n");
 	test_match(t20, teststr, 1, "MCharClass(ac..g)[1..2]");
-	printf("t25\n"); // Negative character class fail
+	printf("t25  Negative character class fail\n");
 	test_match(t20, teststr, 2, "NoMatch");
-	printf("t26\n"); // Scope and Capture
+	printf("t26  Scope and Capture\n");
 	MSpec t26c;
 	 t26c.type = MCAP;
 	 t26c.Cap.id = 0;
