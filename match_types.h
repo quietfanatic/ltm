@@ -21,18 +21,13 @@
 #define MStr_endat(str, i) ((str)[i] == 0)
 #endif
 
-// Size of capture id.  Shorter uses less space, but limits number of captures in one scope.
+// Size of capture id.  Shorter uses less space, but limits number of captures in one scope to 65536.
 #ifndef MCapID_t
 #define MCapID_t uint16_t
 #endif
 
-// Size of flags
-#ifndef MFlags_t
-#define MFlags_t uint16_t
-#endif
-
 // Node types, to be used both for MSpec and for Match
-enum Match_type {
+enum MType {
 	NOMATCH,
 	MNULL,
 	MBEGIN,
@@ -50,8 +45,14 @@ enum Match_type {
 	MNAMECAP,
 	MMULTICAP,
 };
-typedef uint8_t Match_type;
+typedef uint8_t MType_t;
 
+// Flags to be used for various things
+
+enum MFlags {
+	MF_top = 1,  // Independent unit, don't descend on destruction
+};  // More to come later, including backtracking control.
+typedef uint16_t MFlags_t;
 
 
 // Utility structs
@@ -66,8 +67,8 @@ typedef struct MCharRange {
 // MSpec structs
 
 #define MSPEC_STRUCT_COMMON \
-	Match_type type; \
-	MFlags_t flag;
+	MType_t type; \
+	MFlags_t flags;
 
 struct MSpecNoMatch { MSPEC_STRUCT_COMMON };
 struct MSpecNull    { MSPEC_STRUCT_COMMON };
@@ -138,7 +139,8 @@ typedef struct MSpec {
 // Match structs
 
 #define MATCH_STRUCT_COMMON \
-	Match_type type; \
+	MType_t type; \
+	MFlags_t flags; \
 	MSpec* spec; \
 	size_t start; \
 	size_t end;
@@ -298,7 +300,9 @@ MSpec create_MRepMax (MSpec child, size_t min, size_t max) {
 }
 
 
-void destroy_mspec (MSpec spec) {
+void LTM_destroy_MSpec (MSpec spec) {
+	if (spec.flags&MF_top)
+		return;  // Don't destroy this.
 	switch (spec.type) {
 		case MCHARCLASS: {
 			free(spec.CharClass.ranges);
@@ -307,24 +311,24 @@ void destroy_mspec (MSpec spec) {
 		case MGROUP: {
 			int i;
 			for (i=0; i < spec.Group.nelements; i++)
-				destroy_mspec(spec.Group.elements[i]);
+				LTM_destroy_MSpec(spec.Group.elements[i]);
 			free(spec.Group.elements);
 			return;
 		}
 		case MOPT: {
-			destroy_mspec(*spec.Opt.possible);
+			LTM_destroy_MSpec(*spec.Opt.possible);
 			free(spec.Opt.possible);
 			return;
 		}
 		case MALT: {
 			int i;
 			for (i=0; i < spec.Alt.nalts; i++)
-				destroy_mspec(spec.Alt.alts[i]);
+				LTM_destroy_MSpec(spec.Alt.alts[i]);
 			free(spec.Alt.alts);
 			return;
 		}
 		case MREPMAX: case MREPMIN: {
-			destroy_mspec(*spec.Rep.child);
+			LTM_destroy_MSpec(*spec.Rep.child);
 			free(spec.Rep.child);
 			return;
 		}
@@ -332,29 +336,34 @@ void destroy_mspec (MSpec spec) {
 	}
 }
 
-void destroy_match (Match m) {
+void destroy_MSpec (MSpec spec) {
+	spec.flags &=~ MF_top;  // Remove don't-destroy flag
+	return LTM_destroy_MSpec(spec);
+}
+
+void destroy_Match (Match m) {
 	switch (m.type) {
 		case MGROUP: {
 			int i;
 			for (i=0; i < m.Group.nelements; i++) 
-				destroy_match(m.Group.elements[i]);
+				destroy_Match(m.Group.elements[i]);
 			free(m.Group.elements);
 			return;
 		}
 		case MOPT: {
-			destroy_match(*m.Opt.possible);
+			destroy_Match(*m.Opt.possible);
 			free(m.Opt.possible);
 			return;
 		}
 		case MALT: {
-			destroy_match(*m.Alt.matched);
+			destroy_Match(*m.Alt.matched);
 			free(m.Alt.matched);
 			return;
 		}
 		case MREPMAX: case MREPMIN: {
 			int i;
 			for (i=0; i < m.Rep.nmatches; i++)
-				destroy_match(m.Rep.matches[i]);
+				destroy_Match(m.Rep.matches[i]);
 			free(m.Rep.matches);
 			return;
 		}

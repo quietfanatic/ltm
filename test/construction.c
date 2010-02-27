@@ -26,6 +26,6 @@ int main () {
 	puts(t1c);
 	puts(strcmp(t1s, t1c) ? "Failure" : "Success");
 	free(t1s);
-	destroy_mspec(t1);  // No way to test memory freeing :(
+	destroy_MSpec(t1);  // No way to test memory freeing :(
 	return 0;
 }
