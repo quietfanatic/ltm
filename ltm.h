@@ -45,7 +45,12 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 //     return
 
 
-
+Match LTM_match_at (MSpec spec, MStr_t str, size_t start) {
+	Match r;
+	LTM_init_Match(&r, &spec, start);
+	LTM_start(&r, str, NULL);
+	return r;
+}
 
 
 

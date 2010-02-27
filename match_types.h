@@ -79,6 +79,7 @@ struct MSpecChar    { MSPEC_STRUCT_COMMON
 	MChar_t c;
 };
 struct MSpecCharClass { MSPEC_STRUCT_COMMON
+	int negative;
 	size_t nranges;
 	struct MCharRange* ranges;
 };
