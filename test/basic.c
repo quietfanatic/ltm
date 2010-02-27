@@ -245,29 +245,36 @@ int main(int argv, char** argc) {
 	test_match(t20, teststr, 1, "NoMatch");
 	printf("t22\n"); // Character class match
 	test_match(t20, teststr, 2, "MCharClass(ac..g)[2..3]");
-	printf("t23\n"); // Scope and Capture
-	MSpec t23c;
-	 t23c.type = MCAP;
-	 t23c.Cap.id = 0;
-	 t23c.Cap.child = &t3;
-	MSpec t23;
-	 t23.type = MSCOPE;
-	 t23.Scope.ncaps = 1;
-	 t23.Scope.nnamecaps = 0;
-	 t23.Scope.child = &t23c;
-	Match t23r;
-	t23r = test_match(t23, teststr, 0, "MScope(MCap(MChar(a)[0..1])[0..1])[0..1]");
-	if (t23r.Scope.caps[0] == t23r.Scope.child)
+	printf("t23\n"); // Negative character class fail
+	 t20.CharClass.negative = 1;
+	test_match(t20, teststr, 0, "NoMatch");
+	printf("t24\n"); // Negative character class match
+	test_match(t20, teststr, 1, "MCharClass(ac..g)[1..2]");
+	printf("t25\n"); // Negative character class fail
+	test_match(t20, teststr, 2, "NoMatch");
+	printf("t26\n"); // Scope and Capture
+	MSpec t26c;
+	 t26c.type = MCAP;
+	 t26c.Cap.id = 0;
+	 t26c.Cap.child = &t3;
+	MSpec t26;
+	 t26.type = MSCOPE;
+	 t26.Scope.ncaps = 1;
+	 t26.Scope.nnamecaps = 0;
+	 t26.Scope.child = &t26c;
+	Match t26r;
+	t26r = test_match(t26, teststr, 0, "MScope(MCap(MChar(a)[0..1])[0..1])[0..1]");
+	if (t26r.Scope.caps[0] == t26r.Scope.child)
 		printf("Capture succeeded\n");
 	else
-		printf("Capture failed: %08x != %08x\n", t23r.Scope.caps[0], t23r.Scope.child);
-	printf("t24\n");
-	t23c.Cap.child = &t4;
-	t23r = test_match(t23, teststr, 0, "NoMatch");
-	if (t23r.Scope.caps[0] == NULL)
+		printf("Capture failed: %08x != %08x\n", t26r.Scope.caps[0], t26r.Scope.child);
+	printf("t27\n");
+	t26c.Cap.child = &t4;
+	t26r = test_match(t26, teststr, 0, "NoMatch");
+	if (t26r.Scope.caps[0] == NULL)
 		printf("Non-capture succeeded\n");
 	else
-		printf("Non-capture failed: %08x != 00000000\n", t23r.Scope.caps[0]);
+		printf("Non-capture failed: %08x != 00000000\n", t26r.Scope.caps[0]);
 
 	 // cleanup.
 	printf("freeing...\n");
