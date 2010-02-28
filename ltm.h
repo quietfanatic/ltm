@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "match_types.h"
-#define DEBUGLOG(x) //(fprintf(stderr, x))
+#define DEBUGLOG(...) //(fprintf(stderr, __VA_ARGS__))
 
 
 static inline void LTM_init_Match(Match* m, MSpec* spec, size_t start);
@@ -70,6 +70,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MREPMAX:    return LTM_start_MRepMax(m, str, scope);
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
 		case MCAP:       return LTM_start_MCap(m, str, scope);
+		case MNAMECAP:   return LTM_start_MNameCap(m, str, scope);
 		case MREF: {  // Doesn't need its own Match node
 			LTM_init_Match(m, m->spec->Ref.ref, m->start);
 			return LTM_start(m, str, scope);
@@ -90,6 +91,8 @@ void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
 		case MALT: return LTM_backtrack_MAlt(m, str, scope);
 		case MREPMAX: return LTM_backtrack_MRepMax(m, str, scope);
 		case MSCOPE: return LTM_backtrack_MScope(m, str, scope);
+		case MCAP: return LTM_backtrack_MCap(m, str, scope);
+		case MNAMECAP: return LTM_backtrack_MNameCap(m, str, scope);
 		default: {
 			DEBUGLOG(" ## Backtracking past a token\n");
 			m->type = NOMATCH;

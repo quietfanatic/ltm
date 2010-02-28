@@ -47,3 +47,14 @@ static inline void LTM_backtrack_MScope (Match* m, MStr_t str, Match* scope) {
 	return;
 }
 
+Match* LTM_lookup_NameCap (const Match* m, const char* name) {
+	 // To be replaced with generic macro
+	int i;
+	for (i=0; i < m->spec->Scope.nnamecaps; i++) {
+		DEBUGLOG("looking at name %d; it's at %d.\n", i, m->Scope.caps[m->spec->Scope.ncaps+i]);
+		if (strcmp(m->spec->Scope.names[i], name) == 0)
+			return m->Scope.caps[m->spec->Scope.ncaps+i];
+	}
+	return NULL;
+}
+

@@ -82,8 +82,14 @@ void printmatch (Match m) {
 		}
 		case MCAP: {
 			printf("MCap(");
-			printmatch(*m.Scope.child);
+			printmatch(*m.Cap.child);
 			printf(")[%d..%d]", m.start, m.end);
+			return;
+		}
+		case MNAMECAP: {
+			printf("MNameCap(");
+			printmatch(*m.NameCap.child);
+			printf(", \"%s\")[%d..%d]", m.spec->NameCap.name, m.start, m.end);
 			return;
 		}
 		case MALT: {
@@ -275,6 +281,22 @@ int main(int argv, char** argc) {
 		printf("Non-capture succeeded\n");
 	else
 		printf("Non-capture failed: %08x != 00000000\n", t26r.Scope.caps[0]);
+	printf("t28\n");
+	 t26.Scope.nnamecaps = 1;
+	 t26.Scope.names = malloc(sizeof(char*));
+	 t26.Scope.names[0] = "thing";
+	MSpec t28;
+	 t28.type = MNAMECAP;
+	 t28.NameCap.id = 0;
+	 t28.NameCap.name = "thing";
+	 t28.NameCap.child = &t19;
+	 t26.Scope.child = &t28;
+	 t26r = test_match(t26, teststr, 0, "MScope(MNameCap(MGroup(MBegin[0..0], MAny[0..1], MAny[1..2], MAny[2..3], MEnd[3..3])[0..3], \"thing\")[0..3])[0..3]");
+	Match* l = LTM_lookup_NameCap(&t26r, "thing");
+	if (l == t26r.Scope.child)
+		printf("NameCapture succeeded\n");
+	else
+		printf("NameCapture failed: %08x != %08x\n", l, &t28);
 
 	 // cleanup.
 	printf("freeing...\n");
