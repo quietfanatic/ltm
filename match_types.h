@@ -44,6 +44,7 @@ enum MType {
 	MCAP,
 	MNAMECAP,
 	MMULTICAP,
+	MREF,
 };
 typedef uint8_t MType_t;
 
@@ -114,6 +115,9 @@ struct MSpecNameCap { MSPEC_STRUCT_COMMON
 	MCapID_t id;
 	char* name;
 };
+struct MSpecRef {
+	struct MSpec* ref;
+};
 
 typedef struct MSpec {
 	union {
@@ -132,6 +136,7 @@ typedef struct MSpec {
 		struct MSpecScope Scope;
 		struct MSpecCap Cap;
 		struct MSpecNameCap NameCap;
+		struct MSpecRef Ref;
 	};
 } MSpec;
 
@@ -300,6 +305,38 @@ MSpec create_MRepMax (MSpec child, size_t min, size_t max) {
 	return r;
 }
 
+MSpec create_MScope (MSpec child) {
+	MSpec r;
+	r.type = MSCOPE;
+	r.Scope.child = malloc(sizeof(MSpec));
+	*r.Scope.child = child;
+	return r;
+}
+
+MSpec create_MCap (MSpec child) {
+	MSpec r;
+	r.type = MCAP;
+	r.Cap.child = malloc(sizeof(MSpec));
+	*r.Cap.child = child;
+	return r;
+}
+
+MSpec create_MNameCap (MSpec child, char* name) {
+	MSpec r;
+	r.type = MNAMECAP;
+	r.NameCap.child = malloc(sizeof(MSpec));
+	*r.NameCap.child = child;
+	r.NameCap.name = malloc(strlen(name));
+	strcpy(r.NameCap.name, name);
+	return r;
+}
+
+MSpec create_MRef (MSpec* ref) {
+	MSpec r;
+	r.type = MREF;
+	r.Ref.ref = ref;
+	return r;
+}
 
 void LTM_destroy_MSpec (MSpec spec) {
 	if (spec.flags&MF_top)
@@ -332,6 +369,22 @@ void LTM_destroy_MSpec (MSpec spec) {
 			LTM_destroy_MSpec(*spec.Rep.child);
 			free(spec.Rep.child);
 			return;
+		}
+		case MSCOPE: {
+			LTM_destroy_MSpec(*spec.Scope.child);
+			// XXX LTM_destroy_MSpec_MultiCaps(spec);
+			free(spec.Scope.child);
+			return;
+		}
+		case MCAP: {
+			LTM_destroy_MSpec(*spec.Cap.child);
+			free(spec.Cap.child);
+			return;
+		}
+		case MNAMECAP: {
+			LTM_destroy_MSpec(*spec.NameCap.child);
+			free(spec.NameCap.child);
+			free(spec.NameCap.name);
 		}
 		default: return;
 	}

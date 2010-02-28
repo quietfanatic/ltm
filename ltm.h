@@ -70,6 +70,10 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MREPMAX:    return LTM_start_MRepMax(m, str, scope);
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
 		case MCAP:       return LTM_start_MCap(m, str, scope);
+		case MREF: {  // Doesn't need its own Match node
+			LTM_init_Match(m, m->spec->Ref.ref, m->start);
+			return LTM_start(m, str, scope);
+		}
 		default: {
 			fprintf(stderr, "Error: Tried to match with unknown match type %d.\n", m->type);
 			abort();
