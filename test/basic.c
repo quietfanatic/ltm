@@ -240,6 +240,7 @@ int main(int argv, char** argc) {
 	printf("t20  Character class match\n");
 	MSpec t20;
 	 t20.type                = MCHARCLASS;
+	 t20.CharClass.negative  = 0;
 	 t20.CharClass.nranges   = 2;
 	 t20.CharClass.ranges    = malloc(2 * sizeof(struct MCharRange));
 	 t20.CharClass.ranges[0].from = 'a';
@@ -258,7 +259,7 @@ int main(int argv, char** argc) {
 	test_match(t20, teststr, 1, "MCharClass(ac..g)[1..2]");
 	printf("t25  Negative character class fail\n");
 	test_match(t20, teststr, 2, "NoMatch");
-	printf("t26  Scope and Capture\n");
+	printf("t26  Scope and Capture match\n");
 	MSpec t26c;
 	 t26c.type = MCAP;
 	 t26c.Cap.id = 0;
@@ -274,14 +275,14 @@ int main(int argv, char** argc) {
 		printf("Capture succeeded\n");
 	else
 		printf("Capture failed: %08x != %08x\n", t26r.Scope.caps[0], t26r.Scope.child);
-	printf("t27\n");
+	printf("t27  Scope and Capture fail\n");
 	t26c.Cap.child = &t4;
 	t26r = test_match(t26, teststr, 0, "NoMatch");
 	if (t26r.Scope.caps[0] == NULL)
 		printf("Non-capture succeeded\n");
 	else
 		printf("Non-capture failed: %08x != 00000000\n", t26r.Scope.caps[0]);
-	printf("t28\n");
+	printf("t28  Scope and NameCapture match\n");
 	 t26.Scope.nnamecaps = 1;
 	 t26.Scope.names = malloc(sizeof(char*));
 	 t26.Scope.names[0] = "thing";
@@ -297,6 +298,15 @@ int main(int argv, char** argc) {
 		printf("NameCapture succeeded\n");
 	else
 		printf("NameCapture failed: %08x != %08x\n", l, &t28);
+	printf("t29  Ref match\n");
+	MSpec t29;
+	 t29.type = MREF;
+	printf(" ref type is %d\n", t29.type);
+	 t29.Ref.ref = &t28;
+	 t26.Scope.child = &t29;
+	printf(" ref ptr type is %d\n", (&t29)->type);
+	printf(" scope child type is %d\n", t26.Scope.child->type);
+	test_match(t26, teststr, 0, "MScope(MNameCap(MGroup(MBegin[0..0], MAny[0..1], MAny[1..2], MAny[2..3], MEnd[3..3])[0..3], \"thing\")[0..3])[0..3]");
 
 	 // cleanup.
 	printf("freeing...\n");

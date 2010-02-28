@@ -115,7 +115,7 @@ struct MSpecNameCap { MSPEC_STRUCT_COMMON
 	MCapID_t id;
 	char* name;
 };
-struct MSpecRef {
+struct MSpecRef { MSPEC_STRUCT_COMMON
 	struct MSpec* ref;
 };
 

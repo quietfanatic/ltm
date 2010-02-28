@@ -56,6 +56,7 @@ Match LTM_match_at (MSpec spec, MStr_t str, size_t start) {
 
 
 void LTM_start (Match* m, MStr_t str, Match* scope) {
+	DEBUGLOG(" ## About to match type %d.\n", m->type);
 	switch (m->type) {
 		case NOMATCH:    return LTM_start_NoMatch(m, str, scope);
 		case MNULL:      return LTM_start_MNull(m, str, scope);
@@ -73,6 +74,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MNAMECAP:   return LTM_start_MNameCap(m, str, scope);
 		case MREF: {  // Doesn't need its own Match node
 			LTM_init_Match(m, m->spec->Ref.ref, m->start);
+			DEBUGLOG(" Ref type: %d\n", m->spec->Ref.ref->type);
 			return LTM_start(m, str, scope);
 		}
 		default: {
