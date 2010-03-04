@@ -1,4 +1,23 @@
 
+MSpec create_MOpt (MSpec possible) {
+	MSpec r;
+	r.type          = MOPT;
+	r.Opt.possible  = malloc(sizeof(MSpec));
+	*r.Opt.possible = possible;
+	return r;
+}
+
+static inline void LTM_destroy_MSpecOpt (MSpec spec) {
+	free(spec.Opt.possible);
+	return;
+}
+
+static inline void LTM_destroy_MatchOpt (Match m) {
+	destroy_Match(*m.Opt.possible);
+	free(m.Opt.possible);
+	return;
+}
+
 
 static inline void LTM_start_MOpt (Match* m, MStr_t str, Match* scope) {
 	m->Opt.possible = malloc(sizeof(Match));

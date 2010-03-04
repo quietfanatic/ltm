@@ -1,4 +1,10 @@
 
+MSpec create_MChar (char c) {
+	MSpec r;
+	r.type   = MCHAR;
+	r.Char.c = c;
+	return r;
+}
 
 static inline void LTM_start_MChar (Match* m, MStr_t str, Match* scope) {
 	if (MStr_at(str, m->start) == m->spec->Char.c) {

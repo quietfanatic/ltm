@@ -1,4 +1,37 @@
 
+MSpec create_MGroup (int nelements, ...) {
+	MSpec r;
+	r.type            = MGROUP;
+	r.Group.nelements = nelements;
+	r.Group.elements  = malloc(nelements * sizeof(MSpec));
+	if (!r.Group.elements) die("Couldn't malloc r.Group.elements.");
+	va_list elements;
+	va_start(elements, nelements);
+	int i;
+	for (i=0; i < nelements; i++)
+		r.Group.elements[i] = va_arg(elements, MSpec);
+	va_end(elements);
+	return r;
+}
+
+static inline void LTM_destroy_MSpecGroup (MSpec spec) {
+	int i;
+	for (i=0; i < spec.Group.nelements; i++)
+		destroy_MSpec(spec.Group.elements[i]);
+	free(spec.Group.elements);
+	return;
+}
+
+static inline void LTM_destroy_MatchGroup (Match m) {
+	int i;
+	for (i=0; i < m.Group.nelements; i++) 
+		destroy_Match(m.Group.elements[i]);
+	free(m.Group.elements);
+	return;
+}
+
+
+
 static inline void LTM_fail_MGroup (Match* m) {
 	free(m->Group.elements);
 	m->type = NOMATCH;

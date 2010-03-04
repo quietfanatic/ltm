@@ -1,4 +1,33 @@
 
+MSpec create_MAlt (int nalts, ...) {
+	MSpec r;
+	r.type      = MALT;
+	r.Alt.nalts = nalts;
+	r.Alt.alts  = malloc(nalts * sizeof(MSpec));
+	va_list alts;
+	va_start (alts, nalts);
+	int i;
+	for (i=0; i < nalts; i++)
+		r.Alt.alts[i] = va_arg(alts, MSpec);
+	va_end(alts);
+	return r;
+}
+
+static inline void LTM_destroy_MSpecAlt (MSpec spec) {
+	int i;
+	for (i=0; i < spec.Alt.nalts; i++)
+		destroy_MSpec(spec.Alt.alts[i]);
+	free(spec.Alt.alts);
+	return;
+}
+
+static inline void LTM_destroy_MatchAlt (Match m) {
+	destroy_Match(*m.Alt.matched);
+	free(m.Alt.matched);
+	return;
+}
+
+
 static inline void LTM_start_MAlt (Match* m, MStr_t str, Match* scope) {
 	m->Alt.matched = malloc(sizeof(Match));
 	if (!m->Alt.matched) die("Could not malloc m.Alt.matched");

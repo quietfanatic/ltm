@@ -1,4 +1,23 @@
 
+MSpec create_MNull () {
+	MSpec r;
+	r.type = MNULL;
+	return r;
+}
+
+MSpec create_MBegin () {
+	MSpec r;
+	r.type = MBEGIN;
+	return r;
+}
+
+MSpec create_MEnd () {
+	MSpec r;
+	r.type = MEND;
+	return r;
+}
+
+
 static inline void LTM_start_MNull (Match* m, MStr_t str, Match* scope) {
 	DEBUGLOG(" ## Matching MNull\n");
 	m->end = m->start;

@@ -1,6 +1,46 @@
 
+MSpec create_MCap (MSpec child) {
+	MSpec r;
+	r.type = MCAP;
+	r.Cap.child = malloc(sizeof(MSpec));
+	*r.Cap.child = child;
+	return r;
+}
 
+MSpec create_MNameCap (MSpec child, char* name) {
+	MSpec r;
+	r.type = MNAMECAP;
+	r.NameCap.child = malloc(sizeof(MSpec));
+	*r.NameCap.child = child;
+	r.NameCap.name = malloc(strlen(name));
+	strcpy(r.NameCap.name, name);
+	return r;
+}
 
+static inline void LTM_destroy_MSpecCap (MSpec spec) {
+	destroy_MSpec(*spec.Cap.child);
+	free(spec.Cap.child);
+	return;
+}
+
+static inline void LTM_destroy_MSpecNameCap (MSpec spec) {
+	destroy_MSpec(*spec.NameCap.child);
+	free(spec.NameCap.child);
+	free(spec.NameCap.name);
+	return;
+}
+
+static inline void LTM_destroy_MatchCap (Match m) {
+	destroy_Match(*m.Cap.child);
+	free(m.Cap.child);
+	return;
+}
+
+static inline void LTM_destroy_MatchNameCap (Match m) {
+	destroy_Match(*m.NameCap.child);
+	free(m.NameCap.child);
+	return;
+}
 
 
 

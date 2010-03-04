@@ -1,3 +1,30 @@
+
+MSpec create_MRepMax (MSpec child, size_t min, size_t max) {
+	MSpec r;
+	r.type       = MREPMAX;
+	r.Rep.child  = malloc(sizeof(MSpec));
+	*r.Rep.child = child;
+	r.Rep.min    = min;
+	r.Rep.max    = max;
+	return r;
+}
+
+static inline void LTM_destroy_MSpecRep (MSpec spec) {
+	destroy_MSpec(*spec.Rep.child);
+	free(spec.Rep.child);
+	return;
+}
+
+static inline void LTM_destroy_MatchRep (Match m) {
+	int i;
+	for (i=0; i < m.Rep.nmatches; i++)
+		destroy_Match(m.Rep.matches[i]);
+	free(m.Rep.matches);
+	return;
+}
+
+
+
 static inline void LTM_fail_MRep (Match* m) {
 	free(m->Rep.matches);
 	m->type = NOMATCH;

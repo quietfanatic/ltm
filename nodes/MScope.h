@@ -1,3 +1,24 @@
+
+MSpec create_MScope (MSpec child) {
+	MSpec r;
+	r.type = MSCOPE;
+	r.Scope.child = malloc(sizeof(MSpec));
+	*r.Scope.child = child;
+	return r;
+}
+
+static inline void LTM_destroy_MSpecScope (MSpec spec) {
+	destroy_MSpec(*spec.Scope.child);
+	free(spec.Scope.child);
+	return;
+}
+
+static inline void LTM_destroy_MatchScope (Match m) {
+	destroy_Match(*m.Scope.child);
+	free(m.Scope.child);
+	return;
+}
+
 static inline void LTM_destroy_MScope_MultiCaps (Match* m) {
 	int i;
 	for (i=0; i < m->spec->Scope.ncaps + m->spec->Scope.nnamecaps; i++)

@@ -4,15 +4,21 @@
 #define DEBUGLOG(...) //(fprintf(stderr, __VA_ARGS__))
 
 
-static inline void LTM_init_Match(Match* m, MSpec* spec, size_t start);
+
+static inline void destroy_MSpec(MSpec spec);
+static inline void destroy_Match(Match m);
 void LTM_start (Match* m, MStr_t str, Match* scope);
 void LTM_backtrack (Match* m, MStr_t str, Match* scope);
+
+
+
 
 void die (char* mess) {
 	fputs(mess, stderr);
 	abort();
 }
 
+// For convenience
 static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 	m->type  = spec->type;
 	m->spec  = spec;
@@ -31,6 +37,7 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 #include "nodes/MAlt.h"
 #include "nodes/MScope.h"
 #include "nodes/MCap&co.h"
+#include "nodes/MRef.h"
 
 // On match success:
 //     DEBUGLOG()
@@ -72,11 +79,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
 		case MCAP:       return LTM_start_MCap(m, str, scope);
 		case MNAMECAP:   return LTM_start_MNameCap(m, str, scope);
-		case MREF: {  // Doesn't need its own Match node
-			LTM_init_Match(m, m->spec->Ref.ref, m->start);
-			DEBUGLOG(" Ref type: %d\n", m->spec->Ref.ref->type);
-			return LTM_start(m, str, scope);
-		}
+		case MREF:       return LTM_start_MRef(m, str, scope);
 		default: {
 			fprintf(stderr, "Error: Tried to match with unknown match type %d.\n", m->type);
 			abort();
@@ -102,6 +105,52 @@ void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
 		}
 	}
 }
+
+
+static inline void LTM_destroy_MSpec (MSpec spec) {
+	if (spec.flags&MF_independent)
+		return;  // Don't destroy this.
+	switch (spec.type) {
+		case MCHARCLASS: return LTM_destroy_MSpecCharClass(spec);
+		case MGROUP:     return LTM_destroy_MSpecGroup(spec);
+		case MOPT:       return LTM_destroy_MSpecOpt(spec);
+		case MALT:       return LTM_destroy_MSpecAlt(spec);
+		case MREPMAX:
+		case MREPMIN:    return LTM_destroy_MSpecRep(spec);
+		case MSCOPE:     return LTM_destroy_MSpecScope(spec);
+		case MCAP:       return LTM_destroy_MSpecCap(spec);
+		case MNAMECAP:   return LTM_destroy_MSpecNameCap(spec);
+		default: return;
+	}
+}
+
+void destroy_MSpec (MSpec spec) {
+	spec.flags &=~ MF_independent;  // Remove don't-destroy flag
+	return LTM_destroy_MSpec(spec);
+}
+
+void destroy_Match (Match m) {
+	switch (m.type) {
+		case MGROUP:    return LTM_destroy_MatchGroup(m);
+		case MOPT:      return LTM_destroy_MatchOpt(m);
+		case MALT:      return LTM_destroy_MatchAlt(m);
+		case MREPMAX:
+		case MREPMIN:   return LTM_destroy_MatchRep(m);
+		case MSCOPE:    return LTM_destroy_MatchScope(m);
+		case MCAP:      return LTM_destroy_MatchCap(m);
+		case MNAMECAP:  return LTM_destroy_MatchNameCap(m);
+		default: return;
+	}
+}
+
+
+
+
+
+
+
+
+
 
 
 
