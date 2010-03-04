@@ -15,7 +15,7 @@ int main () {
 				create_MRef(BP_expr),  // Recurse here
 				create_MChar(')')
 			),
-			create_MCharClass_s(1, 1, "((")
+			create_MCharClass_s(1, 2, "(())")
 		), 0, 2000000000
 	);
 	*BP_string = create_MGroup(3,
