@@ -17,8 +17,13 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str, Match* scope) {
 				return LTM_fail_MRep(m);
 			}
 			m->Rep.nmatches--;
+			if (m->Rep.nmatches == 0) {
+				DEBUGLOG(" ## Matching MRepMax (with 0 matches) at %d\n", m->start);
+				m->end = m->start;
+				return;
+			}
 			if (m->Rep.nmatches >= m->spec->Rep.min) {  // We've got enough
-				DEBUGLOG(" ## Matching MRepMax (enough matches)\n");
+				DEBUGLOG(" ## Matching MRepMax (with %d matches) at %d\n", m->Rep.nmatches, m->Rep.matches[m->Rep.nmatches-1].end);
 				return LTM_succeed_MRep(m);
 			}
 			LTM_backtrack(&m->Rep.matches[m->Rep.nmatches-1], str, scope);

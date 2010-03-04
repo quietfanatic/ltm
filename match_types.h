@@ -250,11 +250,12 @@ MSpec create_MChar (char c) {
 	return r;
 }
 
-MSpec create_MCharClass (int nranges, char* ranges) {
+MSpec create_MCharClass_s (int negative, int nranges, char* ranges) {
 	MSpec r;
-	r.type              = MCHARCLASS;
-	r.CharClass.nranges = nranges;
-	r.CharClass.ranges  = malloc(nranges * sizeof(struct MCharRange));
+	r.type               = MCHARCLASS;
+	r.CharClass.negative = negative;
+	r.CharClass.nranges  = nranges;
+	r.CharClass.ranges   = malloc(nranges * sizeof(struct MCharRange));
 	memcpy(r.CharClass.ranges, ranges, nranges * sizeof(struct MCharRange));
 	return r;
 }

@@ -24,7 +24,7 @@ static inline void LTM_walk_MGroup (Match* m, MStr_t str, Match* scope, size_t i
 		else {
 			i++;
 			if (i == m->spec->Group.nelements) {  // all the way right
-				DEBUGLOG(" ## Matching MGroup\n");
+				DEBUGLOG(" ## Matching MGroup at %d\n", m->Group.elements[m->spec->Group.nelements-1].end);
 				return LTM_succeed_MGroup(m);
 			}
 			LTM_init_Match(&m->Group.elements[i], &m->spec->Group.elements[i], m->Group.elements[i-1].end);

@@ -237,6 +237,14 @@ int main(int argv, char** argc) {
 	 t19.Group.elements[3] = t1;
 	 t19.Group.elements[4] = end;
 	test_match(t19, teststr, 0, "MGroup(MBegin[0..0], MAny[0..1], MAny[1..2], MAny[2..3], MEnd[3..3])[0..3]");
+	printf("t19.5  MEnd failing MRepMax\n");
+	MSpec t19_5;
+	 t19_5.type              = MGROUP;
+	 t19_5.Group.nelements   = 2;
+	 t19_5.Group.elements    = malloc(2 * sizeof(MSpec));
+	 t19_5.Group.elements[0] = t12;
+	 t19_5.Group.elements[1] = end;
+	test_match(t19_5, teststr, 0, "NoMatch");
 	printf("t20  Character class match\n");
 	MSpec t20;
 	 t20.type                = MCHARCLASS;

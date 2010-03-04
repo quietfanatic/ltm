@@ -2,7 +2,7 @@
 
 static inline void LTM_start_MChar (Match* m, MStr_t str, Match* scope) {
 	if (MStr_at(str, m->start) == m->spec->Char.c) {
-		DEBUGLOG(" ## Matching MChar\n");
+		DEBUGLOG(" ## Matching MChar at %d\n", m->start + 1);
 		m->end = m->start + 1;
 		return;
 	}
