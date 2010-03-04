@@ -27,7 +27,7 @@ class node, but MCHARCLASS is the id of a MCharClass.
 
 
 
-Here are the node types, with any required arguments:
+Here are the node types, with any required arguments to their constructor:
 
 
 NoMatch
@@ -72,13 +72,10 @@ MRepMax (MSpec child, int min, int max)
 	Matches child at least min times, and at most max times.  Prefers to match
 	more rather than less, but will match less if backtracked into.
 
-
-...Unimplemented nodes...
-
-
 MRepMin (MSpec child, int min, int max)
 	Same as MRepMax except it matches as little as possible, matching more only
-	if backtracked into.  Perhaps this and MRepMax will be consolidated.
+	if backtracked into.  This and MRepMax will be consolidated, with a flag to
+	differentiate them.
 
 MScope (MSpec child)
 	Creates a lexical scope for captures.  Any MCapture and MCaptureName nodes
@@ -102,6 +99,14 @@ MNameCap (MSpec child, char* name)
 MMultiCap
 	This is a special node for storing the results of captures matched multiple
 	times.  You can't create it yourself.
+
+MRef
+	Pointer to another MSpec object.  This won't be descended into during
+	destruction.  This allows for recursion and referencing other rules without
+	problems.  For versatility this is another node type rather than a flag.
+	It won't produce its own Match node, it'll just collapse instead.
+
+...UNIMPLEMENTED...
 
 MObject (MObjectSpec* object)
 	This is an extensible type for your own matching needs.  Uses a struct
