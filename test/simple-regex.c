@@ -1,6 +1,9 @@
 #include "ltm.h"
 #include "tostr.h"
 
+
+MSpec SR_transform(Match m);
+
 int main () {
 	MSpec* SR_expr = malloc(sizeof(MSpec));
 	MSpec* SR_group = malloc(sizeof(MSpec));
@@ -128,10 +131,19 @@ int main () {
 
 	Match SR_test_1 = LTM_match_at(*SR_expr, "abc", 0);
 	Match SR_test_2 = LTM_match_at(*SR_expr, "abc(abc)abc", 0);
+	Match SR_test_3 = LTM_match_at(*SR_expr, "abc[abc]abc", 0);
+	Match SR_test_4 = LTM_match_at(*SR_expr, "a(a|ab)(a|ab|abc)*", 0);
+	Match SR_test_5 = LTM_match_at(*SR_expr, "[a-zA-Z0-9]", 0);
 	printf("%d\n", SR_test_1.end);
 	printf("%d\n", SR_test_2.end);
-
-
+	printf("%d\n", SR_test_3.end);
+	printf("%d\n", SR_test_4.end);
+	printf("%d\n", SR_test_5.end);
+	destroy_Match(SR_test_1);
+	destroy_Match(SR_test_2);
+	destroy_Match(SR_test_3);
+	destroy_Match(SR_test_4);
+	destroy_Match(SR_test_5);
 
 
 	return 0;
