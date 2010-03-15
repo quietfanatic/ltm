@@ -38,8 +38,7 @@ enum MType {
 	MALT,
 	MGROUP,
 	MOPT,
-	MREPMAX,
-	MREPMIN,
+	MREP,
 	MSCOPE,
 	MCAP,
 	MNAMECAP,
@@ -48,10 +47,35 @@ enum MType {
 };
 typedef uint8_t MType_t;
 
-// Flags to be used for various things
+const char*const LTM_MType[] = {
+	"NoMatch",
+	"MNull",
+	"MBegin",
+	"MEnd",
+	"MAny",
+	"MChar",
+	"MCharClass",
+	"MAlt",
+	"MGroup",
+	"MOpt",
+	"MRepMax",
+	"MRepMin",
+	"MScope",
+	"MCap",
+	"MNameCap",
+	"MMultiCap",
+	"MRef"
+};
+
+
+// Flags to be used for various things.  Most are NYI.
 
 enum MFlags {
-	MF_independent = 1,  // don't descend on destruction
+	MF_independent = 1,  // Don't descend on destruction (Possibly obsoleted by the MRef type)
+	MF_minimal     = 2,  // Match as little as possible (for MRep, or possibly MGroup too)
+	MF_nobacktrack = 4,  // Don't backtrack.  Should be set automatically on atomic nodes.
+	MF_nocaps      = 8,  // Doesn't have captures.  With MF_nobacktrack, means result can be thrown away.
+	MF_throwaway   = 12, // MF_nobacktrack and MF_nocaps.
 };  // More to come later, including backtracking control.
 typedef uint16_t MFlags_t;
 
@@ -172,11 +196,11 @@ struct MatchOpt { MATCH_STRUCT_COMMON
 };
 struct MatchRep { MATCH_STRUCT_COMMON
 	size_t nmatches;
-	struct Match* matches;
+	struct Match** matches;  // Variable length array needs more indirection.
 };
 struct MatchScope { MATCH_STRUCT_COMMON
 	struct Match* child;
-	struct Match** caps; // Numbered Caps first, then Named Caps.
+	struct Match** caps;  // Numbered Caps first, then Named Caps.
 };
 struct MatchCap { MATCH_STRUCT_COMMON
 	struct Match* child;

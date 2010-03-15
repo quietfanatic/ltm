@@ -1,6 +1,5 @@
 #include "ltm.h"
-#include <stdint.h>
-
+#include "tostr.h"
 
 
 int main () {
@@ -8,7 +7,7 @@ int main () {
 	MSpec* BP_expr = malloc(sizeof(MSpec));
 	MSpec* BP_string = malloc(sizeof(MSpec));
 	*BP_expr =
-	create_MRepMax(
+	create_MRep(0, 0, 2000000000,
 		create_MAlt(2,
 			create_MGroup(3,
 				create_MChar('('),
@@ -16,29 +15,74 @@ int main () {
 				create_MChar(')')
 			),
 			create_MCharClass_s(1, 2, "(())")
-		), 0, 2000000000
+		)
 	);
 	*BP_string = create_MGroup(3,
 		create_MBegin(),
 		create_MRef(BP_expr),
 		create_MEnd()
 	);
+	char* BP_expr_str = mspec_to_str(*BP_expr);
+	puts(BP_expr_str);
+	 //                12345   6789012345678                                                                901234
 	char* BP_test_1 = "asdc(ba)cdsdsacacsac(dsacdsa(AScsadc)()(()cdsac)(cdsacdsacca(((ascdsa)cadscascsad))))asdca()";
 	Match BP_test_1_match = LTM_match_at(*BP_string, BP_test_1, 0);
 	if (BP_test_1_match.type == NOMATCH)
-		puts("BP_test_1 failed to match");
+		puts("BP test 1 failed to match");
 	else
-		puts("BP_test_1 succeeded in matching");
+		puts("BP test 1 succeeded in matching");
 	char* BP_test_2 = "asdc(ba)cdsdsacacsac(dsacdsa(AScsadc)()(()cd(sac)(cdsacdsacca(((ascdsa)cadscascsad))))asdca()";
 	Match BP_test_2_match = LTM_match_at(*BP_string, BP_test_2, 0);
 	if (BP_test_2_match.type == NOMATCH)
-		puts("BP_test_2 succeeded in not matching");
+		puts("BP test 2 succeeded in not matching");
 	else
-		puts("BP_test_2 failed to not match");
+		puts("BP test 2 failed to not match");
 	destroy_MSpec(*BP_expr);
 	free(BP_expr);
 	destroy_MSpec(*BP_string);
 	free(BP_string);
+
+	 // Quantized captures?
+	MSpec* BPC_expr = malloc(sizeof(MSpec));
+	MSpec* BPC_string = malloc(sizeof(MSpec));
+	*BPC_expr =
+	create_MScope(
+		create_MRep(0, 0, 2000000000,
+			create_MCap(
+				create_MAlt(2,
+					create_MGroup(3,
+						create_MChar('('),
+						create_MRef(BPC_expr),
+						create_MChar(')')
+					),
+					create_MCharClass_s(1, 2, "(())")
+				)
+			)
+		)
+	);
+	*BPC_string =
+	create_MScope(
+		create_MGroup(3,
+			create_MBegin(),
+			create_MCap(create_MRef(BPC_expr)),
+			create_MEnd()
+		)
+	);
+	finish_MSpec(BPC_expr);
+	finish_MSpec(BPC_string);
+	Match BPCt1 = LTM_match_at(*BPC_string, BP_test_1, 0);
+	if (BPCt1.type == NOMATCH)
+		puts("BPC test 1 failed to match");
+	else
+		puts("BPC test 1 succeeded in matching");
+	struct MatchMultiCap got = BPCt1.Scope.caps[0]->Cap.child->Scope.caps[0]->MultiCap;
+	printf("Got %d / 24 caps\n", got.nplaces);
+	int i;
+	for (i=0; i < got.nplaces; i++) {
+		printf("  %d: %08x -> %d..%d :: %d\n", i, (int) got.places[i], got.places[i]->start, got.places[i]->end, got.places[i]->type);
+	}
+
+
 	return 0;
 }
 

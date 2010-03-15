@@ -13,6 +13,13 @@ MSpec create_MAlt (int nalts, ...) {
 	return r;
 }
 
+static inline void LTM_finish_MAlt (MSpec* spec, MSpec* scope) {
+	int i;
+	for (i=0; i < spec->Alt.nalts; i++)
+		LTM_finish_MSpec(&spec->Alt.alts[i], scope);
+	return;  // Optimization stuff to go here
+}
+
 static inline void LTM_destroy_MSpecAlt (MSpec spec) {
 	int i;
 	for (i=0; i < spec.Alt.nalts; i++)
@@ -35,12 +42,12 @@ static inline void LTM_start_MAlt (Match* m, MStr_t str, Match* scope) {
 		LTM_init_Match(m->Alt.matched, &m->spec->Alt.alts[m->Alt.alti], m->start);
 		LTM_start(m->Alt.matched, str, scope);
 		if (m->Alt.matched->type != NOMATCH) {
-			DEBUGLOG(" ## Matching MAlt at %d\n", m->Alt.matched->end);
+			DEBUGLOG7(" ## Matching MAlt at %d\n", m->Alt.matched->end);
 			m->end = m->Alt.matched->end;
 			return;
 		}
 	}  // None matched  (An empty Alt always fails, too)
-	DEBUGLOG(" ## Not matching MAlt\n");
+	DEBUGLOG7(" ## Not matching MAlt\n");
 	free(m->Alt.matched);
 	m->type = NOMATCH;
 	return;
@@ -56,17 +63,17 @@ static inline void LTM_backtrack_MAlt (Match* m, MStr_t str, Match* scope) {
 			LTM_init_Match(m->Alt.matched, &m->spec->Alt.alts[m->Alt.alti], m->start);
 			LTM_start(m->Alt.matched, str, scope);
 			if (m->Alt.matched->type != NOMATCH) {
-				DEBUGLOG(" ## Matching MAlt at %d\n", m->Alt.matched->end);
+				DEBUGLOG7(" ## Matching MAlt at %d\n", m->Alt.matched->end);
 				m->end = m->Alt.matched->end;
 				return;
 			}
 		}  // Out of options.
-		DEBUGLOG(" ## Not matching MAlt\n");
+		DEBUGLOG7(" ## Not matching MAlt\n");
 		free(m->Alt.matched);
 		m->type = NOMATCH;
 		return;
 	}
-	DEBUGLOG(" ## Matching MAlt at %d\n", m->Alt.matched->end);
+	DEBUGLOG7(" ## Matching MAlt at %d\n", m->Alt.matched->end);
 	m->end = m->Alt.matched->end;
 	return;
 }

@@ -53,17 +53,17 @@ void printmatch (Match m) {
 			printf(")[%d..%d]", m.start, m.end);
 			return;
 		}
-		case MREPMAX: {
+		case MREP: {
 			if (m.Rep.nmatches == 0) {
-				printf("MRepMax()[%d..%d]", m.start, m.end);
+				printf("MRep()[%d..%d]", m.start, m.end);
 				return;
 			}
-			printf("MRepMax(");
-			printmatch(m.Rep.matches[0]);
+			printf("MRep(");
+			printmatch(*m.Rep.matches[0]);
 			int i;
 			for (i=1; i < m.Rep.nmatches; i++) {
 				printf(", ");
-				printmatch(m.Rep.matches[i]);
+				printmatch(*m.Rep.matches[i]);
 			}
 			printf(")[%d..%d]", m.start, m.end);
 			return;
@@ -183,29 +183,30 @@ int main(int argv, char** argc) {
 	 t11.Group.elements[1] = t9;
 	 t11.Group.elements[2] = t4;
 	test_match(t11, teststr, 0, "MGroup(MChar(a)[0..1], MNull[1..1], MChar(b)[1..2])[0..2]");
-	printf("t12  MRepMax match 0..3\n");
+	printf("t12  MRep match 0..3\n");
 	MSpec t12;
-	 t12.type      = MREPMAX;
+	 t12.type      = MREP;
+	 t12.flags = 0;
 	 t12.Rep.child = &t1;
 	 t12.Rep.min   = 0;
 	 t12.Rep.max   = 3;
-	test_match(t12, teststr, 0, "MRepMax(MAny[0..1], MAny[1..2], MAny[2..3])[0..3]");
-	printf("t13  MRepMax match 3..*\n");
+	test_match(t12, teststr, 0, "MRep(MAny[0..1], MAny[1..2], MAny[2..3])[0..3]");
+	printf("t13  MRep match 3..*\n");
 	 t12.Rep.min   = 3;
 	 t12.Rep.max   = 10000;
-	test_match(t12, teststr, 0, "MRepMax(MAny[0..1], MAny[1..2], MAny[2..3])[0..3]");
-	printf("t14  MRepMax match 0..2\n");
+	test_match(t12, teststr, 0, "MRep(MAny[0..1], MAny[1..2], MAny[2..3])[0..3]");
+	printf("t14  MRep match 0..2\n");
 	 t12.Rep.min   = 0;
 	 t12.Rep.max   = 2;
-	test_match(t12, teststr, 0, "MRepMax(MAny[0..1], MAny[1..2])[0..2]");
-	printf("t15  MRepMax backtracking (any(0..2), b)\n");
+	test_match(t12, teststr, 0, "MRep(MAny[0..1], MAny[1..2])[0..2]");
+	printf("t15  MRep backtracking (any(0..2), b)\n");
 	MSpec t15;
 	 t15.type              = MGROUP;
 	 t15.Group.nelements   = 2;
 	 t15.Group.elements    = malloc(2*sizeof(MSpec));
 	 t15.Group.elements[0] = t12;
 	 t15.Group.elements[1] = t4;
-	test_match(t15, teststr, 0, "MGroup(MRepMax(MAny[0..1])[0..1], MChar(b)[1..2])[0..2]");
+	test_match(t15, teststr, 0, "MGroup(MRep(MAny[0..1])[0..1], MChar(b)[1..2])[0..2]");
 	printf("t16  MAlt match (c | a | any)->a\n");
 	MSpec t16;
 	 t16.type        = MALT;
@@ -237,7 +238,7 @@ int main(int argv, char** argc) {
 	 t19.Group.elements[3] = t1;
 	 t19.Group.elements[4] = end;
 	test_match(t19, teststr, 0, "MGroup(MBegin[0..0], MAny[0..1], MAny[1..2], MAny[2..3], MEnd[3..3])[0..3]");
-	printf("t19.5  MEnd failing MRepMax\n");
+	printf("t19.5  MEnd failing MGroup\n");
 	MSpec t19_5;
 	 t19_5.type              = MGROUP;
 	 t19_5.Group.nelements   = 2;
@@ -282,14 +283,14 @@ int main(int argv, char** argc) {
 	if (t26r.Scope.caps[0] == t26r.Scope.child)
 		printf("Capture succeeded\n");
 	else
-		printf("Capture failed: %08x != %08x\n", t26r.Scope.caps[0], t26r.Scope.child);
+		printf("Capture failed: %08x != %08x\n", (int) t26r.Scope.caps[0], (int) t26r.Scope.child);
 	printf("t27  Scope and Capture fail\n");
 	t26c.Cap.child = &t4;
 	t26r = test_match(t26, teststr, 0, "NoMatch");
 	if (t26r.Scope.caps[0] == NULL)
 		printf("Non-capture succeeded\n");
 	else
-		printf("Non-capture failed: %08x != 00000000\n", t26r.Scope.caps[0]);
+		printf("Non-capture failed: %08x != 00000000\n", (int) t26r.Scope.caps[0]);
 	printf("t28  Scope and NameCapture match\n");
 	 t26.Scope.nnamecaps = 1;
 	 t26.Scope.names = malloc(sizeof(char*));
@@ -305,7 +306,7 @@ int main(int argv, char** argc) {
 	if (l == t26r.Scope.child)
 		printf("NameCapture succeeded\n");
 	else
-		printf("NameCapture failed: %08x != %08x\n", l, &t28);
+		printf("NameCapture failed: %08x != %08x\n", (int) l, (int) &t28);
 	printf("t29  Ref match\n");
 	MSpec t29;
 	 t29.type = MREF;

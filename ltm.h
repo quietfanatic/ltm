@@ -1,10 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "match_types.h"
-#define DEBUGLOG(...) //(fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG0(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG1(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG2(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG3(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG4(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG5(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG6(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG7(...)  //(fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG8(...)  //(fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG9(...)  //(fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG10(...) //(fprintf(stderr, __VA_ARGS__))
+
+
+#define free dont_free
+
+void dont_free(void* p) { return; }
 
 
 
+static inline void LTM_finish_MSpec(MSpec* spec, MSpec* scope);
 static inline void destroy_MSpec(MSpec spec);
 static inline void destroy_Match(Match m);
 void LTM_start (Match* m, MStr_t str, Match* scope);
@@ -56,6 +72,7 @@ Match LTM_match_at (MSpec spec, MStr_t str, size_t start) {
 	Match r;
 	LTM_init_Match(&r, &spec, start);
 	LTM_start(&r, str, NULL);
+	DEBUGLOG1((r.type == NOMATCH ? " # Pattern did not match \"%s\"\n" : " # Finished matching \"%s\"\n"), str);
 	return r;
 }
 
@@ -63,7 +80,7 @@ Match LTM_match_at (MSpec spec, MStr_t str, size_t start) {
 
 
 void LTM_start (Match* m, MStr_t str, Match* scope) {
-	DEBUGLOG(" ## About to match type %d.\n", m->type);
+	DEBUGLOG10(" ## About to start %s.\n", LTM_MType[m->type]);
 	switch (m->type) {
 		case NOMATCH:    return LTM_start_NoMatch(m, str, scope);
 		case MNULL:      return LTM_start_MNull(m, str, scope);
@@ -75,7 +92,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MGROUP:     return LTM_start_MGroup(m, str, scope);
 		case MOPT:       return LTM_start_MOpt(m, str, scope);
 		case MALT:       return LTM_start_MAlt(m, str, scope);
-		case MREPMAX:    return LTM_start_MRepMax(m, str, scope);
+		case MREP:       return LTM_start_MRep(m, str, scope);
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
 		case MCAP:       return LTM_start_MCap(m, str, scope);
 		case MNAMECAP:   return LTM_start_MNameCap(m, str, scope);
@@ -89,17 +106,18 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 
 
 void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
+	DEBUGLOG10(" ## About to backtrack %s.\n", LTM_MType[m->type]);
 	switch (m->type) {
-		case NOMATCH: return LTM_backtrack_NoMatch(m, str, scope);
-		case MGROUP: return LTM_backtrack_MGroup(m, str, scope);
-		case MOPT: return LTM_backtrack_MOpt(m, str, scope);
-		case MALT: return LTM_backtrack_MAlt(m, str, scope);
-		case MREPMAX: return LTM_backtrack_MRepMax(m, str, scope);
-		case MSCOPE: return LTM_backtrack_MScope(m, str, scope);
-		case MCAP: return LTM_backtrack_MCap(m, str, scope);
+		case NOMATCH:  return LTM_backtrack_NoMatch(m, str, scope);
+		case MGROUP:   return LTM_backtrack_MGroup(m, str, scope);
+		case MOPT:     return LTM_backtrack_MOpt(m, str, scope);
+		case MALT:     return LTM_backtrack_MAlt(m, str, scope);
+		case MREP:     return LTM_backtrack_MRep(m, str, scope);
+		case MSCOPE:   return LTM_backtrack_MScope(m, str, scope);
+		case MCAP:     return LTM_backtrack_MCap(m, str, scope);
 		case MNAMECAP: return LTM_backtrack_MNameCap(m, str, scope);
 		default: {
-			DEBUGLOG(" ## Backtracking past a token\n");
+			DEBUGLOG8(" ## Backtracking past a token\n");
 			m->type = NOMATCH;
 			return;
 		}
@@ -115,14 +133,31 @@ static inline void LTM_destroy_MSpec (MSpec spec) {
 		case MGROUP:     return LTM_destroy_MSpecGroup(spec);
 		case MOPT:       return LTM_destroy_MSpecOpt(spec);
 		case MALT:       return LTM_destroy_MSpecAlt(spec);
-		case MREPMAX:
-		case MREPMIN:    return LTM_destroy_MSpecRep(spec);
+		case MREP:       return LTM_destroy_MSpecRep(spec);
 		case MSCOPE:     return LTM_destroy_MSpecScope(spec);
 		case MCAP:       return LTM_destroy_MSpecCap(spec);
 		case MNAMECAP:   return LTM_destroy_MSpecNameCap(spec);
 		default: return;
 	}
 }
+
+void finish_MSpec (MSpec* spec) {
+	LTM_finish_MSpec(spec, NULL);
+}
+
+static inline void LTM_finish_MSpec (MSpec* spec, MSpec* scope) {
+	switch (spec->type) {
+		case MGROUP:   return LTM_finish_MGroup(spec, scope);
+		case MOPT:     return LTM_finish_MOpt(spec, scope);
+		case MALT:     return LTM_finish_MAlt(spec, scope);
+		case MREP:     return LTM_finish_MRep(spec, scope);
+		case MSCOPE:   return LTM_finish_MScope(spec, scope);
+		case MCAP:     return LTM_finish_MCap(spec, scope);
+		case MNAMECAP: return LTM_finish_MNameCap(spec, scope);
+		default: return;
+	}
+}
+
 
 void destroy_MSpec (MSpec spec) {
 	spec.flags &=~ MF_independent;  // Remove don't-destroy flag
@@ -134,8 +169,7 @@ void destroy_Match (Match m) {
 		case MGROUP:    return LTM_destroy_MatchGroup(m);
 		case MOPT:      return LTM_destroy_MatchOpt(m);
 		case MALT:      return LTM_destroy_MatchAlt(m);
-		case MREPMAX:
-		case MREPMIN:   return LTM_destroy_MatchRep(m);
+		case MREP:      return LTM_destroy_MatchRep(m);
 		case MSCOPE:    return LTM_destroy_MatchScope(m);
 		case MCAP:      return LTM_destroy_MatchCap(m);
 		case MNAMECAP:  return LTM_destroy_MatchNameCap(m);

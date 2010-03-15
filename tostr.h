@@ -64,9 +64,21 @@ size_t get_mspec_to_str_length (MSpec spec) {
 		case MOPT: {
 			return 6 + get_mspec_to_str_length(*spec.Opt.possible);
 		}
-		case MREPMAX: { // "MRepMax(Mwhatever, min..max)"
-			return 13 + get_mspec_to_str_length(*spec.Rep.child)
+		case MREP: { // "MRep(Mwhatever, min..max)"
+			return 10 + get_mspec_to_str_length(*spec.Rep.child)
 			          + ndigits(spec.Rep.min) + ndigits(spec.Rep.max);
+		}
+		case MSCOPE: {
+			return 8 + get_mspec_to_str_length(*spec.Scope.child);
+		}
+		case MCAP: {
+			return 6 + get_mspec_to_str_length(*spec.Cap.child);
+		}
+		case MNAMECAP: {
+			return 14 + strlen(spec.NameCap.name) + get_mspec_to_str_length(*spec.NameCap.child);
+		}
+		case MREF: {
+			return 9;
 		}
 		default: {
 			return 8; // "MUnknown"
@@ -127,10 +139,28 @@ static size_t sprint_mspec (char* s, MSpec spec) {
 			pos += sprint_mspec(s+pos, *spec.Opt.possible);
 			return pos + sprintf(s+pos, ")");
 		}
-		case MREPMAX: {
-			size_t pos = sprintf(s, "MRepMax(");
+		case MREP: {
+			size_t pos = sprintf(s, "MRep(");
 			pos += sprint_mspec(s+pos, *spec.Rep.child);
 			return pos + sprintf(s+pos, ", %d..%d)", spec.Rep.min, spec.Rep.max);
+		}
+		case MSCOPE: {
+			size_t pos = sprintf(s, "MScope(");
+			pos += sprint_mspec(s+pos, *spec.Scope.child);
+			return pos + sprintf(s+pos, ")");
+		}
+		case MCAP: {
+			size_t pos = sprintf(s, "MCap(");
+			pos += sprint_mspec(s+pos, *spec.Cap.child);
+			return pos + sprintf(s+pos, ")");
+		}
+		case MNAMECAP: {
+			size_t pos = sprintf(s, "MNameCap(\"%s\", ", spec.NameCap.name);
+			pos += sprint_mspec(s+pos, *spec.NameCap.child);
+			return pos + sprintf(s+pos, ")");
+		}
+		case MREF: {
+			return sprintf(s, "MRef(...)");
 		}
 		default: {
 			return sprintf(s, "MUnknown");

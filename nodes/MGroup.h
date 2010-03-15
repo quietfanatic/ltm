@@ -14,6 +14,13 @@ MSpec create_MGroup (int nelements, ...) {
 	return r;
 }
 
+static inline void LTM_finish_MGroup (MSpec* spec, MSpec* scope) {
+	int i;
+	for (i=0; i < spec->Group.nelements; i++)
+		LTM_finish_MSpec(&spec->Group.elements[i], scope);
+	return;  // Optimization stuff to go here
+}
+
 static inline void LTM_destroy_MSpecGroup (MSpec spec) {
 	int i;
 	for (i=0; i < spec.Group.nelements; i++)
@@ -48,7 +55,7 @@ static inline void LTM_walk_MGroup (Match* m, MStr_t str, Match* scope, size_t i
 	for (;;) {  // If element didn't match, backtrack left
 		if (m->Group.elements[i].type == NOMATCH) {
 			if (i == 0) {  // all the way left
-				DEBUGLOG(" ## Not matching MGroup (Out of tokens to backtrack)\n");
+				DEBUGLOG7(" ## Not matching MGroup (Out of tokens to backtrack)\n");
 				return LTM_fail_MGroup(m);
 			}
 			i--;
@@ -57,7 +64,7 @@ static inline void LTM_walk_MGroup (Match* m, MStr_t str, Match* scope, size_t i
 		else {
 			i++;
 			if (i == m->spec->Group.nelements) {  // all the way right
-				DEBUGLOG(" ## Matching MGroup at %d\n", m->Group.elements[m->spec->Group.nelements-1].end);
+				DEBUGLOG7(" ## Matching MGroup at %d\n", m->Group.elements[m->spec->Group.nelements-1].end);
 				return LTM_succeed_MGroup(m);
 			}
 			LTM_init_Match(&m->Group.elements[i], &m->spec->Group.elements[i], m->Group.elements[i-1].end);
@@ -69,7 +76,7 @@ static inline void LTM_walk_MGroup (Match* m, MStr_t str, Match* scope, size_t i
 static inline void LTM_start_MGroup (Match* m, MStr_t str, Match* scope) {
 	m->Group.nelements = m->spec->Group.nelements;
 	if (m->spec->Group.nelements == 0) {  // Empty group
-		DEBUGLOG(" ## Matching MGroup (as null)\n");
+		DEBUGLOG7(" ## Matching MGroup (as null)\n");
 		m->end = m->start;
 		m->type = MNULL;
 		return;
