@@ -1,7 +1,8 @@
 
-MSpec create_MChar (char c) {
+MSpec create_MChar (MFlags_t flags, char c) {
 	MSpec r;
 	r.type   = MCHAR;
+	r.flags  = flags & MF_nobacktrack;
 	r.Char.c = c;
 	return r;
 }

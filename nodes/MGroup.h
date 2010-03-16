@@ -1,7 +1,8 @@
 
-MSpec create_MGroup (int nelements, ...) {
+MSpec create_MGroup (MFlags_t flags, int nelements, ...) {
 	MSpec r;
 	r.type            = MGROUP;
+	r.flags           = flags;
 	r.Group.nelements = nelements;
 	r.Group.elements  = malloc(nelements * sizeof(MSpec));
 	if (!r.Group.elements) die("Couldn't malloc r.Group.elements.");
@@ -99,4 +100,11 @@ static inline void LTM_backtrack_MGroup (Match* m, MStr_t str, Match* scope) {
 	return;
 }
 
+static inline void LTM_abort_MGroup (Match* m, MStr_t str, Match* scope) {
+	int i;
+	for (i=0; i < m->Group.nelements; i++)
+		LTM_abort(m->Group.elements+i, str, scope);
+	free(m->Group.elements);
+	return;
+}
 

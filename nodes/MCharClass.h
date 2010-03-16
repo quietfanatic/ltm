@@ -6,11 +6,12 @@ MCharRange create_MCharRange (MChar_t from, MChar_t to) {
 	return r;
 }
 
-MSpec create_MCharClass (int negative, int nranges, ...) {
+MSpec create_MCharClass (MFlags_t flags, int negative, int nranges, ...) {
 	va_list ranges;
 	va_start(ranges, nranges);
 	MSpec r;
 	r.type               = MCHARCLASS;
+	r.flags              = flags & MF_nobacktrack;
 	r.CharClass.negative = negative;
 	r.CharClass.nranges  = nranges;
 	r.CharClass.ranges   = malloc(nranges * sizeof(struct MCharRange));
@@ -22,9 +23,10 @@ MSpec create_MCharClass (int negative, int nranges, ...) {
 	return r;
 }
 
-MSpec create_MCharClass_s (int negative, int nranges, char* ranges) {
+MSpec create_MCharClass_s (MFlags_t flags, int negative, int nranges, char* ranges) {
 	MSpec r;
 	r.type               = MCHARCLASS;
+	r.flags              = flags & MF_nobacktrack;
 	r.CharClass.negative = negative;
 	r.CharClass.nranges  = nranges;
 	r.CharClass.ranges   = malloc(nranges * sizeof(struct MCharRange));

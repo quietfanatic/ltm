@@ -50,6 +50,7 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str, Match* scope) {
 				return LTM_fail_MRep(m);
 			}
 			m->Rep.nmatches--;
+			free(m->Rep.matches[m->Rep.nmatches]);
 			if (m->Rep.nmatches == 0) {
 				DEBUGLOG7(" ## Matching MRep (with 0 matches) at %d\n", m->start);
 				m->end = m->start;
@@ -106,4 +107,13 @@ static inline void LTM_backtrack_MRep (Match* m, MStr_t str, Match* scope) {
 	return;
 }
 
+static inline void LTM_abort_MRep (Match* m, MStr_t str, Match* scope) {
+	int i;
+	for (i=0; i < m->Rep.nmatches; i++) {
+		LTM_abort(m->Rep.matches[i], str, scope);
+		free(m->Rep.matches[i]);
+	}
+	free(m->Rep.matches);
+	return;
+}
 

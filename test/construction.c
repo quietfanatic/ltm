@@ -5,19 +5,19 @@
 
 int main () {
 	MSpec t1;
-	t1 = create_MGroup(3,
-		create_MBegin(),
-		create_MAlt(2,
-			create_MGroup(3,
-				create_MChar('a'),
-				create_MChar('b'),
-				create_MChar('c')
+	t1 = create_MGroup(0, 3,
+		create_MBegin(0),
+		create_MAlt(0, 2,
+			create_MGroup(0, 3,
+				create_MChar(0, 'a'),
+				create_MChar(0, 'b'),
+				create_MChar(0, 'c')
 			),
 			create_MRep(0, 0, 52,
-				create_MChar('a')
+				create_MChar(0, 'a')
 			)
 		),
-		create_MEnd()
+		create_MEnd(0)
 	);
 	char* t1s = mspec_to_str(t1);
 	char* t1c = "MGroup(MBegin, MAlt(MGroup(MChar(a), MChar(b), MChar(c)), MRep(MChar(a), 0..52)), MEnd)";

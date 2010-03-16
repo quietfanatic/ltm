@@ -80,6 +80,12 @@ static inline void LTM_backtrack_MScope (Match* m, MStr_t str, Match* scope) {
 	return;
 }
 
+static inline void LTM_abort_MScope (Match* m, MStr_t str, Match* scope) {
+	LTM_abort(m->Scope.child, str, m);
+	free(m->Scope.child);
+	return;
+}
+
 static inline int LTM_indexof_NameCap (const MSpec* spec, const char* name) {
 	 // To be replaced with generic macro
 	int i;
@@ -88,6 +94,45 @@ static inline int LTM_indexof_NameCap (const MSpec* spec, const char* name) {
 			return i;
 	}
 	return -1;
+}
+
+Match* LTM_lookup_Cap (const Match* m, int ind) {
+	if (ind >= m->spec->Scope.ncaps)
+		return NULL;
+	return m->Scope.caps[ind];
+}
+
+struct MatchMultiCap LTM_lookup_all_Caps (const Match* m, int ind) {
+	if (ind >= m->spec->Scope.ncaps) {
+		struct MatchMultiCap r;
+		r.type = MMULTICAP;
+		r.nplaces = 0;
+		return r;
+	}
+	if (m->Scope.caps[ind]->type == MMULTICAP)
+		return m->Scope.caps[ind]->MultiCap;
+	struct MatchMultiCap r;
+	r.type = MMULTICAP;
+	r.nplaces = 1;
+	r.places = m->Scope.caps+ind;
+	return r;
+}
+
+struct MatchMultiCap LTM_lookup_all_NameCaps (const Match* m, const char* name) {
+	int ind = LTM_indexof_NameCap (m->spec, name);
+	if (ind == -1) {
+		struct MatchMultiCap r;
+		r.type = MMULTICAP;
+		r.nplaces = 0;
+		return r;
+	}
+	if (m->Scope.caps[ind]->type == MMULTICAP)
+		return m->Scope.caps[ind]->MultiCap;
+	struct MatchMultiCap r;
+	r.type = MMULTICAP;
+	r.nplaces = 1;
+	r.places = m->Scope.caps+ind;
+	return r;
 }
 
 Match* LTM_lookup_NameCap (const Match* m, const char* name) {

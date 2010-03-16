@@ -23,7 +23,7 @@ static inline void destroy_MSpec(MSpec spec);
 static inline void destroy_Match(Match m);
 void LTM_start (Match* m, MStr_t str, Match* scope);
 void LTM_backtrack (Match* m, MStr_t str, Match* scope);
-
+void LTM_abort (Match* m, MStr_t str, Match* scope);
 
 
 
@@ -40,7 +40,6 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 	return;
 }
 
-#include "nodes/NoMatch.h"
 #include "nodes/MAny.h"
 #include "nodes/MChar.h"
 #include "nodes/MNull&co.h"
@@ -105,6 +104,12 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 
 void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
 	DEBUGLOG10(" ## About to backtrack %s.\n", LTM_MType[m->type]);
+	if (m->flags&MF_nobacktrack) {
+		DEBUGLOG8(" ## Backtracking past a node with MF_nobacktrack set");
+		LTM_abort(m, str, scope);
+		m->type = NOMATCH;
+		return;
+	}
 	switch (m->type) {
 		case NOMATCH:  return LTM_backtrack_NoMatch(m, str, scope);
 		case MGROUP:   return LTM_backtrack_MGroup(m, str, scope);
@@ -121,6 +126,21 @@ void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
 		}
 	}
 }
+
+void LTM_abort (Match* m, MStr_t str, Match* scope) {
+	DEBUGLOG10(" ## Aborting %s.\n", LTM_MType[m->type]);
+	switch (m->type) {
+		case MGROUP:   return LTM_abort_MGroup(m, str, scope);
+		case MOPT:     return LTM_abort_MOpt(m, str, scope);
+		case MALT:     return LTM_abort_MAlt(m, str, scope);
+		case MREP:     return LTM_abort_MRep(m, str, scope);
+		case MSCOPE:   return LTM_abort_MScope(m, str, scope);
+		case MCAP:     return LTM_abort_MCap(m, str, scope);
+		case MNAMECAP: return LTM_abort_MNameCap(m, str, scope);
+		default: return;
+	}
+}
+
 
 
 static inline void LTM_destroy_MSpec (MSpec spec) {

@@ -1,7 +1,8 @@
 
-MSpec create_MAlt (int nalts, ...) {
+MSpec create_MAlt (MFlags_t flags, int nalts, ...) {
 	MSpec r;
 	r.type      = MALT;
+	r.flags     = flags;
 	r.Alt.nalts = nalts;
 	r.Alt.alts  = malloc(nalts * sizeof(MSpec));
 	va_list alts;
@@ -75,5 +76,11 @@ static inline void LTM_backtrack_MAlt (Match* m, MStr_t str, Match* scope) {
 	}
 	DEBUGLOG7(" ## Matching MAlt at %d\n", m->Alt.matched->end);
 	m->end = m->Alt.matched->end;
+	return;
+}
+
+static inline void LTM_abort_MAlt (Match* m, MStr_t str, Match* scope) {
+	LTM_abort(m->Alt.matched, str, scope);
+	free(m->Alt.matched);
 	return;
 }

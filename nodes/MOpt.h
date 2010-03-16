@@ -54,3 +54,9 @@ static inline void LTM_backtrack_MOpt (Match* m, MStr_t str, Match* scope) {
 	m->end = m->Opt.possible->end;
 	return;
 }
+
+static inline void LTM_abort_MOpt (Match* m, MStr_t str, Match* scope) {
+	LTM_abort(m->Opt.possible, str, scope);
+	free(m->Opt.possible);
+	return;
+}

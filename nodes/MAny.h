@@ -1,7 +1,8 @@
 
-MSpec create_MAny () {
+MSpec create_MAny (MFlags_t flags) {
 	MSpec r;
 	r.type = MANY;
+	r.flags = flags & MF_nobacktrack;
 	return r;
 }
 

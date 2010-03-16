@@ -166,6 +166,13 @@ static inline void LTM_backtrack_MCap (Match* m, MStr_t str, Match* scope) {
 	return;
 }
 
+static inline void LTM_abort_MCap (Match* m, MStr_t str, Match* scope) {
+	LTM_abort(m->Cap.child, str, scope);
+	LTM_unlink_MCap(m, m->spec->Cap.id, scope);
+	free(m->Cap.child);
+	return;
+}
+
 static inline void LTM_start_MNameCap (Match* m, MStr_t str, Match* scope) {
 	m->NameCap.child = malloc(sizeof(Match));
 	if (!m->NameCap.child) die("Could not malloc m->NameCap.child.\n");
@@ -194,6 +201,13 @@ static inline void LTM_backtrack_MNameCap (Match* m, MStr_t str, Match* scope) {
 	}
 	DEBUGLOG3(" ## Matching MNameCap id:%d name:\"%s\"\n", m->spec->NameCap.id, m->spec->NameCap.name);
 	m->end = m->NameCap.child->end;
+	return;
+}
+
+static inline void LTM_abort_MNameCap (Match* m, MStr_t str, Match* scope) {
+	LTM_abort(m->Cap.child, str, scope);
+	LTM_unlink_MCap(m, m->spec->NameCap.id + scope->spec->Scope.nnamecaps, scope);
+	free(m->NameCap.child);
 	return;
 }
 

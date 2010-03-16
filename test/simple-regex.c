@@ -2,7 +2,13 @@
 #include "tostr.h"
 
 
-MSpec SR_transform(Match m);
+MSpec SR_transform(Match* m, MStr_t str);
+MSpec SR_transform_expr(Match* m, MStr_t str);
+MSpec SR_transform_group(Match* m, MStr_t str);
+MSpec SR_transform_class(Match* m, MStr_t str);
+MSpec SR_transform_char(Match* m, MStr_t str);
+MSpec SR_transform_atom(Match* m, MStr_t str);
+MSpec SR_transform_unit(Match* m, MStr_t str);
 
 int main () {
 	MSpec* SR_expr = malloc(sizeof(MSpec));
@@ -22,7 +28,7 @@ int main () {
 
 	*SR_expr =
 	create_MScope(
-		create_MRep(0, 0, 2000000000,
+		create_MRep(0, 0, SIZE_MAX,
 			create_MNameCap("unit",
 				create_MScope(
 					create_MGroup(2,
@@ -55,7 +61,7 @@ int main () {
 	create_MScope(
 		create_MGroup(3,
 			create_MChar('['),
-			create_MRep(0, 0, 2000000000,
+			create_MRep(0, 0, SIZE_MAX,
 				create_MCap(
 					create_MScope(
 						create_MAlt(2,
@@ -148,3 +154,54 @@ int main () {
 
 	return 0;
 }
+
+
+
+
+MSpec SR_transform (Match* m, MStr_t str) {
+	return SR_transform_expr(m);
+}
+
+MSpec SR_transform_expr (Match* m, MStr_t str) {
+	MatchMultiCap units = LTM_lookup_all_NameCaps(m, "unit")
+	MSpec* elements = malloc(caps.nplaces * sizeof(MSpec));
+	int i;
+	for (i=0; i < units.nplaces; i++)
+		elements[i] = SR_transform_unit(units.places[i]);
+	MSpec r;
+	r.type = MGROUP;
+	r.nelements = caps.nplaces;
+	r.elements = units;
+	return r;
+}
+
+MSpec SR_transform_unit (Match* m, MStr_t str) {
+	Match* quant = LTM_lookup_NameCap(m, "quant");
+	if (quant == NULL)
+		return SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
+	MSpec r;
+	switch (MStr_at(str, quant->start)) {
+		case '?' {
+			r.type = MOPT;
+			r.Opt.possible = SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
+			return r;
+		}
+		case '+' {
+			r.type = MREP;
+			r.Rep.min = 1;
+			r.Rep.max = SIZE_MAX;
+			r.Rep.child = SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
+			return r;
+		}
+		case '*' {
+			r.type = MREP;
+			r.Rep.min = 0;
+			r.Rep.max = SIZE_MAX;
+			r.Rep.child = SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
+			return r;
+		}
+		default: die("Unknown quantifier character");
+	}
+}
+
+	
