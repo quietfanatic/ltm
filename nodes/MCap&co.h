@@ -1,15 +1,17 @@
 
-MSpec create_MCap (MSpec child) {
+MSpec create_MCap (MFlags_t flags, MSpec child) {
 	MSpec r;
 	r.type = MCAP;
+	r.flags = flags;
 	r.Cap.child = malloc(sizeof(MSpec));
 	*r.Cap.child = child;
 	return r;
 }
 
-MSpec create_MNameCap (char* name, MSpec child) {
+MSpec create_MNameCap (MFlags_t flags, char* name, MSpec child) {
 	MSpec r;
 	r.type = MNAMECAP;
+	r.flags = flags;
 	r.NameCap.child = malloc(sizeof(MSpec));
 	*r.NameCap.child = child;
 	r.NameCap.name = malloc(strlen(name));

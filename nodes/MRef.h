@@ -1,7 +1,8 @@
 
-MSpec create_MRef (MSpec* ref) {
+MSpec create_MRef (MFlags_t flags, MSpec* ref) {
 	MSpec r;
 	r.type = MREF;
+	r.flags = flags;
 	r.Ref.ref = ref;
 	return r;
 }

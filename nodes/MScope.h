@@ -1,7 +1,8 @@
 
-MSpec create_MScope (MSpec child) {
+MSpec create_MScope (MFlags_t flags, MSpec child) {
 	MSpec r;
 	r.type = MSCOPE;
+	r.flags = flags;
 	r.Scope.child = malloc(sizeof(MSpec));
 	*r.Scope.child = child;
 	return r;

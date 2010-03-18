@@ -8,19 +8,19 @@ int main () {
 	MSpec* BP_string = malloc(sizeof(MSpec));
 	*BP_expr =
 	create_MRep(0, 0, 2000000000,
-		create_MAlt(2,
-			create_MGroup(3,
-				create_MChar('('),
-				create_MRef(BP_expr),  // Recurse here
-				create_MChar(')')
+		create_MAlt(0, 2,
+			create_MGroup(0, 3,
+				create_MChar(0, '('),
+				create_MRef(0, BP_expr),  // Recurse here
+				create_MChar(0, ')')
 			),
-			create_MCharClass_s(1, 2, "(())")
+			create_MCharClass_s(0, 1, 2, "(())")
 		)
 	);
-	*BP_string = create_MGroup(3,
-		create_MBegin(),
-		create_MRef(BP_expr),
-		create_MEnd()
+	*BP_string = create_MGroup(0, 3,
+		create_MBegin(0),
+		create_MRef(0, BP_expr),
+		create_MEnd(0)
 	);
 	char* BP_expr_str = mspec_to_str(*BP_expr);
 	puts(BP_expr_str);
@@ -46,26 +46,26 @@ int main () {
 	MSpec* BPC_expr = malloc(sizeof(MSpec));
 	MSpec* BPC_string = malloc(sizeof(MSpec));
 	*BPC_expr =
-	create_MScope(
+	create_MScope(0,
 		create_MRep(0, 0, 2000000000,
-			create_MCap(
-				create_MAlt(2,
-					create_MGroup(3,
-						create_MChar('('),
-						create_MRef(BPC_expr),
-						create_MChar(')')
+			create_MCap(0, 
+				create_MAlt(0, 2,
+					create_MGroup(0, 3,
+						create_MChar(0, '('),
+						create_MRef(0, BPC_expr),
+						create_MChar(0, ')')
 					),
-					create_MCharClass_s(1, 2, "(())")
+					create_MCharClass_s(0, 1, 2, "(())")
 				)
 			)
 		)
 	);
 	*BPC_string =
-	create_MScope(
-		create_MGroup(3,
-			create_MBegin(),
-			create_MCap(create_MRef(BPC_expr)),
-			create_MEnd()
+	create_MScope(0, 
+		create_MGroup(0, 3,
+			create_MBegin(0),
+			create_MCap(0, create_MRef(0, BPC_expr)),
+			create_MEnd(0)
 		)
 	);
 	finish_MSpec(BPC_expr);

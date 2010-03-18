@@ -6,7 +6,6 @@ MSpec SR_transform(Match* m, MStr_t str);
 MSpec SR_transform_expr(Match* m, MStr_t str);
 MSpec SR_transform_group(Match* m, MStr_t str);
 MSpec SR_transform_class(Match* m, MStr_t str);
-MSpec SR_transform_char(Match* m, MStr_t str);
 MSpec SR_transform_atom(Match* m, MStr_t str);
 MSpec SR_transform_unit(Match* m, MStr_t str);
 
@@ -27,17 +26,17 @@ int main () {
 	// quant { <[*+?]> }
 
 	*SR_expr =
-	create_MScope(
+	create_MScope(0,
 		create_MRep(0, 0, SIZE_MAX,
-			create_MNameCap("unit",
-				create_MScope(
-					create_MGroup(2,
-						create_MNameCap("atom",
-							create_MRef(SR_atom)
+			create_MNameCap(0, "unit",
+				create_MScope(0,
+					create_MGroup(0, 2,
+						create_MNameCap(0, "atom",
+							create_MRef(0, SR_atom)
 						),
-						create_MOpt(
-							create_MNameCap("quant",
-								create_MRef(SR_quant)
+						create_MOpt(0, 
+							create_MNameCap(0, "quant",
+								create_MRef(0, SR_quant)
 							)
 						)
 					)
@@ -47,33 +46,33 @@ int main () {
 	);
 
 	*SR_group =
-	create_MScope(
-		create_MGroup(3,
-			create_MChar('('),
-			create_MCap(
-				create_MRef(SR_expr)
+	create_MScope(0, 
+		create_MGroup(0, 3,
+			create_MChar(0, '('),
+			create_MCap(0, 
+				create_MRef(0, SR_expr)
 			),
-			create_MChar(')')
+			create_MChar(0, ')')
 		)
 	);
 
 	*SR_class =
-	create_MScope(
-		create_MGroup(3,
-			create_MChar('['),
+	create_MScope(0,
+		create_MGroup(0, 3,
+			create_MChar(0, '['),
 			create_MRep(0, 0, SIZE_MAX,
-				create_MCap(
-					create_MScope(
-						create_MAlt(2,
-							create_MNameCap("one",
-								create_MRef(SR_char)
+				create_MCap(0,
+					create_MScope(0,
+						create_MAlt(0, 2,
+							create_MNameCap(0, "one",
+								create_MRef(0, SR_char)
 							),
-							create_MNameCap("range",
-								create_MScope(
-									create_MGroup(3,
-										create_MCap(create_MRef(SR_char)),
-										create_MChar('-'),
-										create_MCap(create_MRef(SR_char))
+							create_MNameCap(0, "range",
+								create_MScope(0,
+									create_MGroup(0, 3,
+										create_MCap(0, create_MRef(0, SR_char)),
+										create_MChar(0, '-'),
+										create_MCap(0, create_MRef(0, SR_char))
 									)
 								)
 							)
@@ -81,46 +80,46 @@ int main () {
 					)
 				)
 			),
-			create_MChar(']')
+			create_MChar(0, ']')
 		)
 	);
 	
 	*SR_char = 
-	create_MScope(
-		create_MAlt(2,
-			create_MGroup(2,
-				create_MChar('\\'),
-				create_MNameCap("esc",
-					create_MAny()
+	create_MScope(0,
+		create_MAlt(0, 2,
+			create_MGroup(0, 2,
+				create_MChar(0, '\\'),
+				create_MNameCap(0, "esc",
+					create_MAny(0)
 				)
 			),
-			create_MNameCap("lit",
-				create_MCharClass_s(1, 10, "\\\\(())[[]]**++\?\?{{}}")
+			create_MNameCap(0, "lit",
+				create_MCharClass_s(0, 1, 10, "\\\\(())[[]]**++\?\?{{}}")
 			)
 		)
 	);
 
 	*SR_atom =
-	create_MScope(
-		create_MAlt(4,
-			create_MNameCap("group",
-				create_MRef(SR_group)
+	create_MScope(0, 
+		create_MAlt(0, 4,
+			create_MNameCap(0, "group",
+				create_MRef(0, SR_group)
 			),
-			create_MNameCap("class",
-				create_MRef(SR_class)
+			create_MNameCap(0, "class",
+				create_MRef(0, SR_class)
 			),
-			create_MNameCap("char",
-				create_MRef(SR_char)
+			create_MNameCap(0, "char",
+				create_MRef(0, SR_char)
 			),
-			create_MNameCap("any",
-				create_MChar('.')
+			create_MNameCap(0, "any",
+				create_MChar(0, '.')
 			)
 		)
 	);
 
 	*SR_quant = 
-	create_MScope(
-		create_MCharClass_s(0, 3, "**++\?\?")
+	create_MScope(0,
+		create_MCharClass_s(0, 0, 3, "**++\?\?")
 	);
 	finish_MSpec(SR_expr);
 	puts(mspec_to_str(*SR_expr));
@@ -163,12 +162,13 @@ MSpec SR_transform (Match* m, MStr_t str) {
 }
 
 MSpec SR_transform_expr (Match* m, MStr_t str) {
-	MatchMultiCap units = LTM_lookup_all_NameCaps(m, "unit")
+	struct MatchMultiCap units = LTM_lookup_all_NameCaps(m, "unit")
 	MSpec* elements = malloc(caps.nplaces * sizeof(MSpec));
 	int i;
 	for (i=0; i < units.nplaces; i++)
-		elements[i] = SR_transform_unit(units.places[i]);
+		elements[i] = SR_transform_unit(units.places[i]->Cap.child);
 	MSpec r;
+	r.flags = flags;
 	r.type = MGROUP;
 	r.nelements = caps.nplaces;
 	r.elements = units;
@@ -178,30 +178,51 @@ MSpec SR_transform_expr (Match* m, MStr_t str) {
 MSpec SR_transform_unit (Match* m, MStr_t str) {
 	Match* quant = LTM_lookup_NameCap(m, "quant");
 	if (quant == NULL)
-		return SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
-	MSpec r;
+		return SR_transform_atom(LTM_lookup_NameCap(m, "atom")->NameCap.child);
 	switch (MStr_at(str, quant->start)) {
 		case '?' {
-			r.type = MOPT;
-			r.Opt.possible = SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
-			return r;
+			return create_MOpt(0, SR_transform_atom(LTM_lookup_NameCap(m, "atom")->NameCap.child));
 		}
 		case '+' {
-			r.type = MREP;
-			r.Rep.min = 1;
-			r.Rep.max = SIZE_MAX;
-			r.Rep.child = SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
-			return r;
+			return create_MRep(0,
+				1,
+				SIZE_MAX,
+				SR_transform_atom(LTM_lookup_NameCap(m, "atom")->NameCap.child),
+			);
 		}
 		case '*' {
-			r.type = MREP;
-			r.Rep.min = 0;
-			r.Rep.max = SIZE_MAX;
-			r.Rep.child = SR_transform_atom(LTM_lookup_NameCap(m, "atom"));
-			return r;
+			return create_MRep(0,
+				0,
+				SIZE_MAX,
+				SR_transform_atom(LTM_lookup_NameCap(m, "atom")->NameCap.child),
+			);
 		}
 		default: die("Unknown quantifier character");
 	}
 }
 
-	
+MSpec SR_transform_atom (Match* m, MStr_t str) {
+	Match* atom;
+	return
+		  (atom = LTM_lookup_NameCap(m, "group"))
+			? SR_transform_group(atom->Cap.child, str)
+		: (atom = LTM_lookup_NameCap(m, "class"))
+			? SR_transform_class(atom->Cap.child, str)
+		: (atom = LTM_lookup_NameCap(m, "char"))
+			? SR_transform_char(atom->Cap.child, str)
+		: (atom = LTM_lookup_NameCap(m, "any"))
+			? create_MAny(0)
+		: die("Unknown atom type");
+}
+
+MSpec SR_transform_group (Match* m, MStr_t str) {
+	return
+	create_MScope(0,
+		SR_transform_expr(LTM_lookup_Cap(m, 0)->Cap.child);
+	);
+}
+
+MSpec SR_transform_class (Match* m, MStr_t str) {
+	struct MatchMultiCap units = LTM_lookup_all_Caps(m, 0);
+
+
