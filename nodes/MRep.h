@@ -2,7 +2,7 @@
 MSpec create_MRep (MFlags_t flags, size_t min, size_t max, MSpec child) {
 	MSpec r;
 	r.type       = MREP;
-	r.flags  = flags;
+	r.flags      = flags;
 	r.Rep.child  = malloc(sizeof(MSpec));
 	*r.Rep.child = child;
 	r.Rep.min    = min;
@@ -108,8 +108,8 @@ static inline void LTM_backtrack_MRep (Match* m, MStr_t str, Match* scope) {
 }
 
 static inline void LTM_abort_MRep (Match* m, MStr_t str, Match* scope) {
-	int i;
-	for (i=0; i < m->Rep.nmatches; i++) {
+	int i;  // Have to go through them backwards.
+	for (i = m->Rep.nmatches-1; i >= 0; i--) {
 		LTM_abort(m->Rep.matches[i], str, scope);
 		free(m->Rep.matches[i]);
 	}

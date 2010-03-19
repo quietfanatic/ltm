@@ -3,7 +3,7 @@
 #include "match_types.h"
 
 
-static long ndigits (long n) {
+static int ndigits (unsigned long n) {
 	return
 	  n < 10 ? 1
 	: n < 100 ? 2
@@ -48,6 +48,8 @@ size_t get_mspec_to_str_length (MSpec spec) {
 			return r;
 		}
 		case MGROUP: {
+			if (spec.Group.nelements == 0)
+				return 8;
 			int r = 6;
 			int i;
 			for (i=0; i < spec.Group.nelements; i++)
@@ -55,6 +57,8 @@ size_t get_mspec_to_str_length (MSpec spec) {
 			return r;
 		}
 		case MALT: {
+			if (spec.Alt.nalts == 0)
+				return 6;
 			int r = 4;
 			int i;
 			for (i=0; i < spec.Alt.nalts; i++)
@@ -112,7 +116,7 @@ static size_t sprint_mspec (char* s, MSpec spec) {
 			for (i=0; i < spec.CharClass.nranges; i++) {
 				s[pos++] = spec.CharClass.ranges[i].from;
 				if (spec.CharClass.ranges[i].from < spec.CharClass.ranges[i].to)
-					pos += sprintf(s+pos, "..%c", spec.CharClass.ranges[i].to);
+					pos += sprintf(s+pos, "-%c", spec.CharClass.ranges[i].to);
 			}
 			return pos + sprintf(s+pos, ")");
 		}
@@ -142,7 +146,7 @@ static size_t sprint_mspec (char* s, MSpec spec) {
 		case MREP: {
 			size_t pos = sprintf(s, "MRep(");
 			pos += sprint_mspec(s+pos, *spec.Rep.child);
-			return pos + sprintf(s+pos, ", %d..%d)", spec.Rep.min, spec.Rep.max);
+			return pos + sprintf(s+pos, ", %u..%u)", spec.Rep.min, spec.Rep.max);
 		}
 		case MSCOPE: {
 			size_t pos = sprintf(s, "MScope(");

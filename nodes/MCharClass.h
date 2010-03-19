@@ -6,6 +6,11 @@ MCharRange create_MCharRange (MChar_t from, MChar_t to) {
 	return r;
 }
 
+static int LTM_cmp_MCharRanges (const MCharRange* l, const MCharRange* r) {
+	if (l->from < r->from) return -1;
+	return l->from > r->from;
+}
+
 MSpec create_MCharClass (MFlags_t flags, int negative, int nranges, ...) {
 	va_list ranges;
 	va_start(ranges, nranges);
@@ -33,6 +38,10 @@ MSpec create_MCharClass_s (MFlags_t flags, int negative, int nranges, char* rang
 	if (!r.CharClass.ranges) die("Couldn't malloc r.CharClass.ranges.");
 	memcpy(r.CharClass.ranges, ranges, nranges * sizeof(struct MCharRange));
 	return r;
+}
+
+static inline void LTM_finish_MCharClass (MSpec* spec, MSpec* scope) {
+	qsort(spec->CharClass.ranges, spec->CharClass.nranges, sizeof(MCharRange), &LTM_cmp_MCharRanges);
 }
 
 static inline void LTM_destroy_MSpecCharClass (MSpec spec) {

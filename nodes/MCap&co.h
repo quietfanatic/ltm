@@ -207,8 +207,8 @@ static inline void LTM_backtrack_MNameCap (Match* m, MStr_t str, Match* scope) {
 }
 
 static inline void LTM_abort_MNameCap (Match* m, MStr_t str, Match* scope) {
-	LTM_abort(m->Cap.child, str, scope);
-	LTM_unlink_MCap(m, m->spec->NameCap.id + scope->spec->Scope.nnamecaps, scope);
+	LTM_abort(m->NameCap.child, str, scope);
+	LTM_unlink_MCap(m, m->spec->NameCap.id + scope->spec->Scope.ncaps, scope);
 	free(m->NameCap.child);
 	return;
 }

@@ -1,7 +1,8 @@
 
-MSpec create_MOpt (MSpec possible) {
+MSpec create_MOpt (MFlags_t flags, MSpec possible) {
 	MSpec r;
 	r.type          = MOPT;
+	r.flags         = flags;
 	r.Opt.possible  = malloc(sizeof(MSpec));
 	*r.Opt.possible = possible;
 	return r;

@@ -65,9 +65,9 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 //     return
 
 
-Match LTM_match_at (MSpec spec, MStr_t str, size_t start) {
+Match LTM_match_at (MSpec* spec, MStr_t str, size_t start) {
 	Match r;
-	LTM_init_Match(&r, &spec, start);
+	LTM_init_Match(&r, spec, start);
 	LTM_start(&r, str, NULL);
 	DEBUGLOG1((r.type == NOMATCH ? " # Pattern did not match \"%s\"\n" : " # Finished matching \"%s\"\n"), str);
 	return r;
@@ -165,13 +165,14 @@ void finish_MSpec (MSpec* spec) {
 
 static inline void LTM_finish_MSpec (MSpec* spec, MSpec* scope) {
 	switch (spec->type) {
-		case MGROUP:   return LTM_finish_MGroup(spec, scope);
-		case MOPT:     return LTM_finish_MOpt(spec, scope);
-		case MALT:     return LTM_finish_MAlt(spec, scope);
-		case MREP:     return LTM_finish_MRep(spec, scope);
-		case MSCOPE:   return LTM_finish_MScope(spec, scope);
-		case MCAP:     return LTM_finish_MCap(spec, scope);
-		case MNAMECAP: return LTM_finish_MNameCap(spec, scope);
+		case MCHARCLASS: return LTM_finish_MCharClass(spec, scope);
+		case MGROUP:     return LTM_finish_MGroup(spec, scope);
+		case MOPT:       return LTM_finish_MOpt(spec, scope);
+		case MALT:       return LTM_finish_MAlt(spec, scope);
+		case MREP:       return LTM_finish_MRep(spec, scope);
+		case MSCOPE:     return LTM_finish_MScope(spec, scope);
+		case MCAP:       return LTM_finish_MCap(spec, scope);
+		case MNAMECAP:   return LTM_finish_MNameCap(spec, scope);
 		default: return;
 	}
 }

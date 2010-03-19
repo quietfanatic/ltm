@@ -101,8 +101,8 @@ static inline void LTM_backtrack_MGroup (Match* m, MStr_t str, Match* scope) {
 }
 
 static inline void LTM_abort_MGroup (Match* m, MStr_t str, Match* scope) {
-	int i;
-	for (i=0; i < m->Group.nelements; i++)
+	int i;  // Have to go through them backwards.
+	for (i = m->Group.nelements-1; i >= 0; i--)
 		LTM_abort(m->Group.elements+i, str, scope);
 	free(m->Group.elements);
 	return;

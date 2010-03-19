@@ -26,13 +26,13 @@ int main () {
 	puts(BP_expr_str);
 	 //                12345   6789012345678                                                                901234
 	char* BP_test_1 = "asdc(ba)cdsdsacacsac(dsacdsa(AScsadc)()(()cdsac)(cdsacdsacca(((ascdsa)cadscascsad))))asdca()";
-	Match BP_test_1_match = LTM_match_at(*BP_string, BP_test_1, 0);
+	Match BP_test_1_match = LTM_match_at(BP_string, BP_test_1, 0);
 	if (BP_test_1_match.type == NOMATCH)
 		puts("BP test 1 failed to match");
 	else
 		puts("BP test 1 succeeded in matching");
 	char* BP_test_2 = "asdc(ba)cdsdsacacsac(dsacdsa(AScsadc)()(()cd(sac)(cdsacdsacca(((ascdsa)cadscascsad))))asdca()";
-	Match BP_test_2_match = LTM_match_at(*BP_string, BP_test_2, 0);
+	Match BP_test_2_match = LTM_match_at(BP_string, BP_test_2, 0);
 	if (BP_test_2_match.type == NOMATCH)
 		puts("BP test 2 succeeded in not matching");
 	else
@@ -70,7 +70,7 @@ int main () {
 	);
 	finish_MSpec(BPC_expr);
 	finish_MSpec(BPC_string);
-	Match BPCt1 = LTM_match_at(*BPC_string, BP_test_1, 0);
+	Match BPCt1 = LTM_match_at(BPC_string, BP_test_1, 0);
 	if (BPCt1.type == NOMATCH)
 		puts("BPC test 1 failed to match");
 	else
