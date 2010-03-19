@@ -16,6 +16,7 @@ const MSpec NOMATCH_CONST = { NOMATCH };
 
 
 int main () {
+	MSpec* SR_top = malloc(sizeof(MSpec));
 	MSpec* SR_expr = malloc(sizeof(MSpec));
 	MSpec* SR_alt = malloc(sizeof(MSpec));
 	MSpec* SR_unit = malloc(sizeof(MSpec));
@@ -32,6 +33,17 @@ int main () {
 	// char { $<lit> = . || \\ $<esc> = . }
 	// atom { <group> || <class> || <char> || $<any> = '.' }
 	// quant { <[*+?]> }
+	
+	*SR_top =
+	create_MScope(0,
+		create_MGroup(0, 3,
+			create_MBegin(0),
+			create_MCap(0,
+				create_MRef(0,SR_expr)
+			),
+			create_MEnd(0)
+		)
+	);
 
 	*SR_expr =
 	create_MScope(0,
@@ -149,6 +161,8 @@ int main () {
 	create_MScope(0,
 		create_MCharClass_s(0, 0, 3, "**++\?\?")
 	);
+	finish_MSpec(SR_top);
+	puts(mspec_to_str(*SR_top));
 	finish_MSpec(SR_expr);
 	puts(mspec_to_str(*SR_expr));
 	finish_MSpec(SR_alt);
@@ -166,16 +180,18 @@ int main () {
 	finish_MSpec(SR_quant);
 	puts(mspec_to_str(*SR_quant));
 
-	Match SR_test_1 = LTM_match_at(SR_expr, "abc", 0);
-	Match SR_test_2 = LTM_match_at(SR_expr, "abc(abc)abc", 0);
-	Match SR_test_3 = LTM_match_at(SR_expr, "abc[abc]abc", 0);
-	Match SR_test_4 = LTM_match_at(SR_expr, "a(a|ab)(a|ab|abc)*", 0);
-	Match SR_test_5 = LTM_match_at(SR_expr, "[a-zA-Z0-9]", 0);
+	Match SR_test_1 = LTM_match_at(SR_top, "abc", 0);
+	Match SR_test_2 = LTM_match_at(SR_top, "abc(abc)abc", 0);
+	Match SR_test_3 = LTM_match_at(SR_top, "abc[abc]abc", 0);
+	Match SR_test_4 = LTM_match_at(SR_top, "a(a|ab)(a|ab|abc)*", 0);
+	Match SR_test_5 = LTM_match_at(SR_top, "[a-zA-Z0-9]", 0);
+	Match SR_test_6 = LTM_match_at(SR_top, "\\||\\((ab\\t[\\t\\]]+)", 0);
 	printf("%d / 3\n", SR_test_1.end);
 	printf("%d / 11\n", SR_test_2.end);
 	printf("%d / 11\n", SR_test_3.end);
 	printf("%d / 18\n", SR_test_4.end);
 	printf("%d / 11\n", SR_test_5.end);
+	printf("%d / 18\n", SR_test_6.end);
 	//destroy_Match(SR_test_1);
 	//destroy_Match(SR_test_2);
 	//destroy_Match(SR_test_3);
@@ -196,6 +212,9 @@ int main () {
 	MSpec SR_trans_5 = SR_transform(&SR_test_5, "[a-zA-Z0-9]");
 	puts(mspec_to_str(SR_trans_5));
 	puts("MAlt(MGroup(MCharClass(a-zA-Z0-9)))");
+	MSpec SR_trans_6 = SR_transform(&SR_test_6, "\\||\\((ab\\t[\\t\\]]+)");
+	puts(mspec_to_str(SR_trans_6));
+	puts("MAlt(MGroup(MChar(|)), MGroup(MChar((), MAlt(MGroup(MChar(a), MChar(b), MChar(\t), MRep(MCharClass(\t]), 1..4294967295)))))");
 
 	return 0;
 }
@@ -204,7 +223,9 @@ int main () {
 
 
 MSpec SR_transform (Match* m, MStr_t str) {
-	return SR_transform_expr(m, str);
+	if (m->type == NOMATCH)
+		return NOMATCH_CONST;
+	return SR_transform_expr(LTM_lookup_Cap(m, 0)->Cap.child, str);
 }
 
 MSpec SR_transform_expr (Match* m, MStr_t str) {

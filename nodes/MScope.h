@@ -121,7 +121,7 @@ struct MatchMultiCap LTM_lookup_all_Caps (const Match* m, int ind) {
 
 struct MatchMultiCap LTM_lookup_all_NameCaps (const Match* m, const char* name) {
 	int ind = LTM_indexof_NameCap (m->spec, name);
-	if (ind == -1) {
+	if (ind == -1 || m->Scope.caps[ind] == NULL) {
 		struct MatchMultiCap r;
 		r.type = MMULTICAP;
 		r.nplaces = 0;

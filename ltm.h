@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "match_types.h"
-#define DEBUGLOG0(...)  //(fprintf(stderr, __VA_ARGS__))
-#define DEBUGLOG1(...)  //(fprintf(stderr, __VA_ARGS__))
-#define DEBUGLOG2(...)  //(fprintf(stderr, __VA_ARGS__))
-#define DEBUGLOG3(...)  //(fprintf(stderr, __VA_ARGS__))
-#define DEBUGLOG4(...)  //(fprintf(stderr, __VA_ARGS__))
-#define DEBUGLOG5(...)  //(fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG0(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG1(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG2(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG3(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG4(...)  (fprintf(stderr, __VA_ARGS__))
+#define DEBUGLOG5(...)  (fprintf(stderr, __VA_ARGS__))
 #define DEBUGLOG6(...)  //(fprintf(stderr, __VA_ARGS__))
 #define DEBUGLOG7(...)  //(fprintf(stderr, __VA_ARGS__))
 #define DEBUGLOG8(...)  //(fprintf(stderr, __VA_ARGS__))
@@ -104,7 +104,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 
 void LTM_backtrack (Match* m, MStr_t str, Match* scope) {
 	DEBUGLOG10(" ## About to backtrack %s.\n", LTM_MType[m->type]);
-	if (m->flags&MF_nobacktrack) {
+	if (m->spec->flags&MF_nobacktrack) {
 		DEBUGLOG8(" ## Backtracking past a node with MF_nobacktrack set");
 		LTM_abort(m, str, scope);
 		m->type = NOMATCH;
