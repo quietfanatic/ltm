@@ -1,0 +1,20 @@
+
+
+
+TODO: (Not in any particular order)
+
+
+
+Simplify scope/capture code
+Implement MCall, etc.
+Add optimization capabilities
+ -- Spreading of MF_nobacktrack etc.
+ -- Forgetting data when appropriate.
+ -- MStr type
+
+Canonicalize tostr in some form
+Create some implementations
+ -- Easy: "scope(group('a', 'b'))" or such
+ -- P5ish
+ -- Custom (P6ish)?
+
