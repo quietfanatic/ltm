@@ -26,6 +26,10 @@
 #define MCapID_t uint16_t
 #endif
 
+
+typedef struct MSpec MSpec;
+typedef struct Match Match;
+
 // Node types, to be used both for MSpec and for Match
 enum MType {
 	NOMATCH,
@@ -44,6 +48,7 @@ enum MType {
 	MNAMECAP,
 	MMULTICAP,
 	MREF,
+	MCALL,
 };
 typedef uint8_t MType_t;
 
@@ -64,7 +69,8 @@ const char*const LTM_MType[] = {
 	"MCap",
 	"MNameCap",
 	"MMultiCap",
-	"MRef"
+	"MRef",
+	"MCustom"
 };
 
 
@@ -87,6 +93,13 @@ typedef struct MCharRange {
 	MChar_t to;
 } MCharRange;
 
+typedef struct MCustomSpec {
+	void (* start ) (Match*, MStr_t, Match*);
+	void (* backtrack ) (Match*, MStr_t, Match*);
+	void (* abort ) (Match*, MStr_t, Match*);
+	void (* finish ) (Match*, MStr_t, Match*);
+	void (* destroy ) (Match*, MStr_t, Match*);
+} MCustomSpec;
 
 
 // MSpec structs
@@ -142,8 +155,11 @@ struct MSpecNameCap { MSPEC_STRUCT_COMMON
 struct MSpecRef { MSPEC_STRUCT_COMMON
 	struct MSpec* ref;
 };
+struct MSpecCustom { MSPEC_STRUCT_COMMON
+	struct MCustomSpec* call;
+};
 
-typedef struct MSpec {
+struct MSpec {
 	union {
 		struct { MSPEC_STRUCT_COMMON };
 		struct MSpecNoMatch No;
@@ -161,8 +177,9 @@ typedef struct MSpec {
 		struct MSpecCap Cap;
 		struct MSpecNameCap NameCap;
 		struct MSpecRef Ref;
+		struct MSpecCustom Custom;
 	};
-} MSpec;
+};
 
 
 
@@ -212,8 +229,12 @@ struct MatchMultiCap { MATCH_STRUCT_COMMON
 	size_t nplaces;
 	struct Match** places;
 };
+struct MatchCustom { MATCH_STRUCT_COMMON
+	void* data1;
+	void* data2;
+};
 
-typedef struct Match {
+struct Match {
 	union {
 		struct { MATCH_STRUCT_COMMON };
 		struct NoMatch No;
@@ -231,7 +252,8 @@ typedef struct Match {
 		struct MatchCap Cap;
 		struct MatchNameCap NameCap;
 		struct MatchMultiCap MultiCap;
+		struct MatchCustom Custom;
 	};
-} Match;
+};
 
 #endif
