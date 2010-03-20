@@ -12,7 +12,10 @@ MSpec SR_transform_unit(Match* m, MStr_t str);
 MChar_t SR_transform_char(Match* m, MStr_t str);
 MChar_t SR_escchar(MChar_t e);
 
-const MSpec NOMATCH_CONST = { NOMATCH };
+const MSpec NOMATCH_CONST = {{{
+	.type = NOMATCH,
+	.flags = 0
+}}};
 
 
 int main () {
@@ -215,6 +218,16 @@ int main () {
 	MSpec SR_trans_6 = SR_transform(&SR_test_6, "\\||\\((ab\\t[\\t\\]]+)");
 	puts(mspec_to_str(SR_trans_6));
 	puts("MAlt(MGroup(MChar(|)), MGroup(MChar((), MAlt(MGroup(MChar(a), MChar(b), MChar(\t), MRep(MCharClass(\t]), 1..4294967295)))))");
+	finish_MSpec(&SR_trans_4);
+	Match SRt4m1 = LTM_match_at(&SR_trans_4, "aaabababc", 0);
+	printf("%d / 9\n", SRt4m1.end);
+	Match SRt4m2 = LTM_match_at(&SR_trans_4, "aababcaaaaaacaaa", 0);
+	printf("%d / 12\n", SRt4m2.end);
+	Match SRt4m3 = LTM_match_at(&SR_trans_4, "aa", 0);
+	printf("%d / 2\n", SRt4m3.end);
+	Match SRt4m4 = LTM_match_at(&SR_trans_4, "ababc", 0);
+	printf("%s / NoMatch\n", LTM_MType[SRt4m4.type]);
+
 
 	return 0;
 }

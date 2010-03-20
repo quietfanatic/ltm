@@ -97,8 +97,8 @@ typedef struct MCustomSpec {
 	void (* start ) (Match*, MStr_t, Match*);
 	void (* backtrack ) (Match*, MStr_t, Match*);
 	void (* abort ) (Match*, MStr_t, Match*);
-	void (* finish ) (Match*, MStr_t, Match*);
-	void (* destroy ) (Match*, MStr_t, Match*);
+	void (* finish ) (Match*);
+	void (* destroy ) (Match*);
 } MCustomSpec;
 
 
