@@ -57,7 +57,7 @@ static inline void LTM_walk_MRep (Match* m, MStr_t str, Match* scope) {
 				return;
 			}
 			if (m->Rep.nmatches >= m->spec->Rep.min) {  // We've got enough
-				DEBUGLOG7(" ## Matching MRep (with %d matches) at %d\n", m->Rep.nmatches, m->Rep.matches[m->Rep.nmatches-1].end);
+				DEBUGLOG7(" ## Matching MRep (with %d matches) at %d\n", m->Rep.nmatches, m->Rep.matches[m->Rep.nmatches-1]->end);
 				return LTM_succeed_MRep(m);
 			}
 			LTM_backtrack(m->Rep.matches[m->Rep.nmatches-1], str, scope);

@@ -5,11 +5,14 @@ By quietfanatic, under the terms of the Artistic License.
 
 Under Construction. :)
 
+This document is more of a self-reference than a guide for (non-existent)
+users.  Several things will be (and already are) out of date.
+
+
 
 
 
 Okay, here's what's going on.
-
 
 To start matching, you need an MSpec tree.  Use the Create_<nodetype>()
 functions to make one.  Use the destroy_mspec() function to recursively free
