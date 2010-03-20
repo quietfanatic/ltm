@@ -12,10 +12,10 @@ MSpec SR_transform_unit(Match* m, MStr_t str);
 MChar_t SR_transform_char(Match* m, MStr_t str);
 MChar_t SR_escchar(MChar_t e);
 
-const MSpec NOMATCH_CONST = {{{
+const MSpec NOMATCH_CONST = {{
 	.type = NOMATCH,
 	.flags = 0
-}}};
+}};
 
 
 int main () {

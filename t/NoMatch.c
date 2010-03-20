@@ -5,9 +5,9 @@
 int main () {
 	plan(1);
 	
-	MSpec nm = {{{
+	MSpec nm = {{
 		.type = NOMATCH
-	}}};
+	}};
 	
 	char* teststr = "abcdef";
 	

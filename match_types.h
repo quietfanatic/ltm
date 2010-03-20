@@ -26,9 +26,9 @@
 #define MCapID_t uint16_t
 #endif
 
-
-typedef struct MSpec MSpec;
-typedef struct Match Match;
+// Our two main type here.
+typedef union MSpec MSpec;
+typedef union Match Match;
 
 // Node types, to be used both for MSpec and for Match
 enum MType {
@@ -119,66 +119,64 @@ struct MSpecChar    { MSPEC_STRUCT_COMMON
 struct MSpecCharClass { MSPEC_STRUCT_COMMON
 	int negative;
 	size_t nranges;
-	struct MCharRange* ranges;
+	MCharRange* ranges;
 };
 struct MSpecAlt { MSPEC_STRUCT_COMMON
 	size_t nalts;
-	struct MSpec* alts;
+	MSpec* alts;
 };
 struct MSpecGroup { MSPEC_STRUCT_COMMON
 	size_t nelements;
-	struct MSpec* elements;
+	MSpec* elements;
 };
 struct MSpecOpt { MSPEC_STRUCT_COMMON
-	struct MSpec* possible;
+	MSpec* possible;
 };
 struct MSpecRep { MSPEC_STRUCT_COMMON
-	struct MSpec* child;
+	MSpec* child;
 	size_t min;
 	size_t max;
 };
 struct MSpecScope { MSPEC_STRUCT_COMMON
-	struct MSpec* child;
+	MSpec* child;
 	MCapID_t ncaps;
 	MCapID_t nnamecaps;
 	char** names;
 };
 struct MSpecCap { MSPEC_STRUCT_COMMON
-	struct MSpec* child;
+	MSpec* child;
 	MCapID_t id;
 };
 struct MSpecNameCap { MSPEC_STRUCT_COMMON
-	struct MSpec* child;
+	MSpec* child;
 	MCapID_t id;
 	char* name;
 };
 struct MSpecRef { MSPEC_STRUCT_COMMON
-	struct MSpec* ref;
+	MSpec* ref;
 };
 struct MSpecCustom { MSPEC_STRUCT_COMMON
-	struct MCustomSpec* call;
+	MCustomSpec* call;
 };
 
-struct MSpec {
-	union {
-		struct { MSPEC_STRUCT_COMMON };
-		struct MSpecNoMatch No;
-		struct MSpecNull Null;
-		struct MSpecBegin Begin;
-		struct MSpecEnd End;
-		struct MSpecAny Any;
-		struct MSpecChar Char;
-		struct MSpecCharClass CharClass;
-		struct MSpecAlt Alt;
-		struct MSpecGroup Group;
-		struct MSpecOpt Opt;
-		struct MSpecRep Rep;
-		struct MSpecScope Scope;
-		struct MSpecCap Cap;
-		struct MSpecNameCap NameCap;
-		struct MSpecRef Ref;
-		struct MSpecCustom Custom;
-	};
+union MSpec {
+	struct { MSPEC_STRUCT_COMMON };
+	struct MSpecNoMatch No;
+	struct MSpecNull Null;
+	struct MSpecBegin Begin;
+	struct MSpecEnd End;
+	struct MSpecAny Any;
+	struct MSpecChar Char;
+	struct MSpecCharClass CharClass;
+	struct MSpecAlt Alt;
+	struct MSpecGroup Group;
+	struct MSpecOpt Opt;
+	struct MSpecRep Rep;
+	struct MSpecScope Scope;
+	struct MSpecCap Cap;
+	struct MSpecNameCap NameCap;
+	struct MSpecRef Ref;
+	struct MSpecCustom Custom;
 };
 
 
@@ -202,58 +200,56 @@ struct MatchChar { MATCH_STRUCT_COMMON };
 struct MatchCharClass { MATCH_STRUCT_COMMON };
 struct MatchAlt { MATCH_STRUCT_COMMON
 	size_t alti;
-	struct Match* matched;
+	Match* matched;
 };
 struct MatchGroup { MATCH_STRUCT_COMMON
 	size_t nelements;
-	struct Match* elements;
+	Match* elements;
 };
 struct MatchOpt { MATCH_STRUCT_COMMON
-	struct Match* possible;
+	Match* possible;
 };
 struct MatchRep { MATCH_STRUCT_COMMON
 	size_t nmatches;
-	struct Match** matches;  // Variable length array needs more indirection.
+	Match** matches;  // Variable length array needs more indirection.
 };
 struct MatchScope { MATCH_STRUCT_COMMON
-	struct Match* child;
-	struct Match** caps;  // Numbered Caps first, then Named Caps.
+	Match* child;
+	Match** caps;  // Numbered Caps first, then Named Caps.
 };
 struct MatchCap { MATCH_STRUCT_COMMON
-	struct Match* child;
+	Match* child;
 };
 struct MatchNameCap { MATCH_STRUCT_COMMON
-	struct Match* child;
+	Match* child;
 };
 struct MatchMultiCap { MATCH_STRUCT_COMMON
 	size_t nplaces;
-	struct Match** places;
+	Match** places;
 };
 struct MatchCustom { MATCH_STRUCT_COMMON
 	void* data1;
 	void* data2;
 };
 
-struct Match {
-	union {
-		struct { MATCH_STRUCT_COMMON };
-		struct NoMatch No;
-		struct MatchNull Null;
-		struct MatchBegin Begin;
-		struct MatchEnd End;
-		struct MatchAny Any;
-		struct MatchChar Char;
-		struct MatchCharClass CharClass;
-		struct MatchAlt Alt;
-		struct MatchGroup Group;
-		struct MatchOpt Opt;
-		struct MatchRep Rep;
-		struct MatchScope Scope;
-		struct MatchCap Cap;
-		struct MatchNameCap NameCap;
-		struct MatchMultiCap MultiCap;
-		struct MatchCustom Custom;
-	};
+union Match {
+	struct { MATCH_STRUCT_COMMON };
+	struct NoMatch No;
+	struct MatchNull Null;
+	struct MatchBegin Begin;
+	struct MatchEnd End;
+	struct MatchAny Any;
+	struct MatchChar Char;
+	struct MatchCharClass CharClass;
+	struct MatchAlt Alt;
+	struct MatchGroup Group;
+	struct MatchOpt Opt;
+	struct MatchRep Rep;
+	struct MatchScope Scope;
+	struct MatchCap Cap;
+	struct MatchNameCap NameCap;
+	struct MatchMultiCap MultiCap;
+	struct MatchCustom Custom;
 };
 
 #endif
