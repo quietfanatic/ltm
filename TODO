@@ -10,11 +10,21 @@ Implement MCall, etc.
 Add optimization capabilities
  -- Spreading of MF_nobacktrack etc.
  -- Forgetting data when appropriate.
- -- MStr type
-
+ -- MString type
+Complete meta-programming defines
 Canonicalize tostr in some form
 Create some implementations
  -- Easy: "scope(group('a', 'b'))" or such
  -- P5ish
  -- Custom (P6ish)?
+Break loop-matching on zero-width things
+Make more matching functions (LTM_match_anywhere, etc.)
+Refactor tests to a more formal system
+Remove create_* functions
+Refactor code into flat layout
+   (breaking apart into nodes/* may have been a mistake)
+Implement MLongest
+ -- And change acronym :)
+
+
 
