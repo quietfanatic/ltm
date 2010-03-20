@@ -6,9 +6,11 @@ MCharRange create_MCharRange (MChar_t from, MChar_t to) {
 	return r;
 }
 
-static int LTM_cmp_MCharRanges (const MCharRange* l, const MCharRange* r) {
-	if (l->from < r->from) return -1;
-	return l->from > r->from;
+int LTM_cmp_MCharRanges (const void* l, const void* r) {
+	MCharRange lq = *(MCharRange*) l;
+	MCharRange rq = *(MCharRange*) r;
+	if (lq.from < rq.from) return -1;
+	return lq.from > rq.from;
 }
 
 MSpec create_MCharClass (MFlags_t flags, int negative, int nranges, ...) {
