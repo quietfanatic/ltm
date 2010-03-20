@@ -10,6 +10,7 @@ int main () {
 		.type = MANY,
 		.flags = 0
 	}};
+	finish_MSpec(&many);
 	
 	char* teststr = "abcdef";
 	Match result = LTM_match_at(&many, teststr, 0);

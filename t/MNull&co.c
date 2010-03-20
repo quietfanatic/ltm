@@ -10,6 +10,7 @@ int main () {
 		.type = MNULL,
 		.flags = 0
 	}};
+	finish_MSpec(mnull);
 	
 	char* teststr = "abcdef";
 	Match result = LTM_match_at(&mnull, teststr, 0);
@@ -34,6 +35,7 @@ int main () {
 		.type = MBEGIN,
 		.flags = 0
 	}};
+	finish_MSpec(mbegin);
 
 	result = LTM_match_at(&mbegin, teststr, 0);
 	is(result.type, MBEGIN, "MBegin matches at beginning");
@@ -53,6 +55,7 @@ int main () {
 		.type = MEND,
 		.flags = 0
 	}};
+	finish_MSpec(mend);
 
 	result = LTM_match_at(&mend, teststr, 0);
 	is(result.type, NOMATCH, "MEnd doesn't match at beginning");

@@ -11,6 +11,7 @@ int main () {
 		.flags = 0,
 		.c = 'a'
 	}};
+	finish_MSpec(&mchar_a);
 	
 	char* teststr = "abcdef";
 

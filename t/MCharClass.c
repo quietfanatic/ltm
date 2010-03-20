@@ -26,6 +26,7 @@ int main () {
 //			{ .from = '|', .to = '|' }
 //		}
 	}};
+	finish_MSpec(&mcc);
 	
 	char* teststr = "abcdefxyz|~";
 
