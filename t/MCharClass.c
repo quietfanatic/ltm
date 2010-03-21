@@ -31,17 +31,17 @@ int main () {
 	char* teststr = "abcdefxyz|~";
 
 	Match result = LTM_match_at(&mcc, teststr, 0);
-	is(result.type, MCHARCLASS, "MCharClass[a-cx-y|] matches a");
+	isnt(result.type, NOMATCH, "MCharClass[a-cx-y|] matches a");
 	is(result.start, 0, "MCharClass.start is correct");
 	is(result.end, 1, "MCharClass match has width 1");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 1);
-	is(result.type, MCHARCLASS, "MCharClass[a-cx-y|] matches b");
+	isnt(result.type, NOMATCH, "MCharClass[a-cx-y|] matches b");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 2);
-	is(result.type, MCHARCLASS, "MCharClass[a-cx-y|] matches c");
+	isnt(result.type, NOMATCH, "MCharClass[a-cx-y|] matches c");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 3);
@@ -53,11 +53,11 @@ int main () {
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 6);
-	is(result.type, MCHARCLASS, "MCharClass[a-cx-y|] matches x");
+	isnt(result.type, NOMATCH, "MCharClass[a-cx-y|] matches x");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 7);
-	is(result.type, MCHARCLASS, "MCharClass[a-cx-y|] matches y");
+	isnt(result.type, NOMATCH, "MCharClass[a-cx-y|] matches y");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 8);
@@ -65,7 +65,7 @@ int main () {
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 9);
-	is(result.type, MCHARCLASS, "MCharClass[a-cx-y|] matches |");
+	isnt(result.type, NOMATCH, "MCharClass[a-cx-y|] matches |");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mcc, teststr, 10);

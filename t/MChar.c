@@ -16,7 +16,7 @@ int main () {
 	char* teststr = "abcdef";
 
 	Match result = LTM_match_at(&mchar_a, teststr, 0);
-	is(result.type, MCHAR, "MChar(a) matches a");
+	isnt(result.type, NOMATCH, "MChar(a) matches a");
 	is(result.start, 0, "MChar.start is correct");
 	is(result.end, 1, "MChar match has width 1");
 	destroy_Match(result);

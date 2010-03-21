@@ -10,23 +10,23 @@ int main () {
 		.type = MNULL,
 		.flags = 0
 	}};
-	finish_MSpec(mnull);
+	finish_MSpec(&mnull);
 	
 	char* teststr = "abcdef";
 	Match result = LTM_match_at(&mnull, teststr, 0);
-	is(result.type, MNULL, "MNull matches at beginning");
+	isnt(result.type, NOMATCH, "MNull matches at beginning");
 	is(result.start, 0, "MNull.start is correct");
 	is(result.end, 0, "MNull match has no width");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mnull, teststr, 3);
-	is(result.type, MNULL, "MNull matches in middle");
+	isnt(result.type, NOMATCH, "MNull matches in middle");
 	is(result.start, 3, "MNull.start is correct");
 	is(result.end, 3, "MNull match has no width");
 	destroy_Match(result);
 
 	result = LTM_match_at(&mnull, teststr, 6);
-	is(result.type, MNULL, "MNull matches at end");
+	isnt(result.type, NOMATCH, "MNull matches at end");
 	is(result.start, 6, "MNull.start is correct");
 	is(result.end, 6, "MNull match has no width");
 	destroy_Match(result);
@@ -35,10 +35,10 @@ int main () {
 		.type = MBEGIN,
 		.flags = 0
 	}};
-	finish_MSpec(mbegin);
+	finish_MSpec(&mbegin);
 
 	result = LTM_match_at(&mbegin, teststr, 0);
-	is(result.type, MBEGIN, "MBegin matches at beginning");
+	isnt(result.type, NOMATCH, "MBegin matches at beginning");
 	is(result.start, 0, "MBegin.start is correct");
 	is(result.end, 0, "MBegin match has no width");
 	destroy_Match(result);
@@ -55,7 +55,7 @@ int main () {
 		.type = MEND,
 		.flags = 0
 	}};
-	finish_MSpec(mend);
+	finish_MSpec(&mend);
 
 	result = LTM_match_at(&mend, teststr, 0);
 	is(result.type, NOMATCH, "MEnd doesn't match at beginning");
@@ -66,7 +66,7 @@ int main () {
 	destroy_Match(result);
 
 	result = LTM_match_at(&mend, teststr, 6);
-	is(result.type, MEND, "Mend matches at end");
+	isnt(result.type, NOMATCH, "Mend matches at end");
 	is(result.start, 6, "MEnd.start is correct");
 	is(result.end, 6, "MEnd match has no width");
 	destroy_Match(result);
