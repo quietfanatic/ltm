@@ -45,6 +45,14 @@
 #endif
 
 
+// NameCap name type
+#ifndef MName_t
+#define MName_t char*
+#endif
+
+#ifndef MName_cmp
+#define MName_cmp(l, r) ( strcmp((l), (r)) )
+#endif
 
 // Size of capture id.  Shorter uses less space, but limits number of captures in one scope to 65536.
 #ifndef MCapID_t

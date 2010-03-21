@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include "match_types.h"
 #define DEBUGLOG0(...)  //(fprintf(stderr, __VA_ARGS__))
 #define DEBUGLOG1(...)  //(fprintf(stderr, __VA_ARGS__))
