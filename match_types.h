@@ -1,3 +1,5 @@
+#ifndef HAVE_MATCH_TYPES
+#define HAVE_MATCH_TYPES
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -5,26 +7,8 @@
 #include <string.h>
 
 
-#ifndef HAVE_MATCH_TYPES
-#define HAVE_MATCH_TYPES
 
-// Size of one character
-#ifndef MChar_t
-#define MChar_t char
-#endif
-
-// What kind of string to operate on and how to get characters from it.
-#ifndef MStr_t
-#define MStr_t MChar_t* // default: zero-padded string of MChar_t
-#define MStr_at(str, i) ((str)[i])
-#define MStr_beginat(str, i) ((i) == 0)
-#define MStr_endat(str, i) ((str)[i] == 0)
-#endif
-
-// Size of capture id.  Shorter uses less space, but limits number of captures in one scope to 65536.
-#ifndef MCapID_t
-#define MCapID_t uint16_t
-#endif
+#include "meta.h"
 
 // Our two main type here.
 typedef union MSpec MSpec;
@@ -187,8 +171,8 @@ union MSpec {
 	MType_t type; \
 	MFlags_t flags; \
 	MSpec* spec; \
-	size_t start; \
-	size_t end;
+	MPos_t start; \
+	MPos_t end;
 
 
 struct NoMatch { MATCH_STRUCT_COMMON };

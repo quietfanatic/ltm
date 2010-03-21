@@ -7,13 +7,13 @@ MSpec create_MAny (MFlags_t flags) {
 }
 
 static inline void LTM_start_MAny (Match* m, MStr_t str, Match* scope) {
-	if (MStr_endat(str, m->start)) {  // Fails only at end of string
+	if (MStr_end_at(str, m->start)) {  // Fails only at end of string
 		DEBUGLOG7(" ## Not matching MAny (end of string)\n");
 		m->type = NOMATCH;
 		return;
 	}
 	DEBUGLOG7(" ## Matching MAny\n");
-	m->end = m->start + 1;
+	m->end = MStr_after(str, m->start);
 	return;
 }
 

@@ -53,7 +53,7 @@ static inline void LTM_destroy_MSpecCharClass (MSpec spec) {
 
 static inline void LTM_start_MCharClass (Match* m, MStr_t str, Match* scope) {
 	int i;  // Ranges must be sorted to work.
-	if (MStr_endat(str, m->start)) {
+	if (MStr_end_at(str, m->start)) {
 		DEBUGLOG7(" ## Not matching MCharClass (end of string)\n");
 		m->type = NOMATCH;
 		return;

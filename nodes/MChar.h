@@ -8,9 +8,12 @@ MSpec create_MChar (MFlags_t flags, char c) {
 }
 
 static inline void LTM_start_MChar (Match* m, MStr_t str, Match* scope) {
-	if (MStr_at(str, m->start) == m->spec->Char.c) {
-		DEBUGLOG7(" ## Matching MChar at %d\n", m->start + 1);
-		m->end = m->start + 1;
+	MPos_t pos = m->start;
+	char c;
+	MStr_read(str, pos, c);
+	if (c == m->spec->Char.c) {
+		DEBUGLOG7(" ## Matching MChar at %d\n", MStr_after(str, m->start));
+		m->end = pos;
 		return;
 	}
 	DEBUGLOG7(" ## Not Matching MChar\n");

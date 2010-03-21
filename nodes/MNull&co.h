@@ -25,7 +25,7 @@ static inline void LTM_start_MNull (Match* m, MStr_t str, Match* scope) {
 }
 
 static inline void LTM_start_MBegin (Match* m, MStr_t str, Match* scope) {
-	if (MStr_beginat(str, m->start)) {
+	if (MStr_begin_at(str, m->start)) {
 		DEBUGLOG7(" ## Matching MBegin\n");
 		m->end = m->start;
 		return;
@@ -36,7 +36,7 @@ static inline void LTM_start_MBegin (Match* m, MStr_t str, Match* scope) {
 }
 
 static inline void LTM_start_MEnd (Match* m, MStr_t str, Match* scope) {
-	if (MStr_endat(str, m->start)) {
+	if (MStr_end_at(str, m->start)) {
 		DEBUGLOG7(" ## Matching MEnd\n");
 		m->end = m->start;
 		return;
