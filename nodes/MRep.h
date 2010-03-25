@@ -45,20 +45,19 @@ static inline void LTM_succeed_MRep (Match* m) {
 static inline void LTM_walk_MRep (Match* m, MStr_t str, Match* scope) {
 	for (;;) {  // If child didn't match, backtrack left
 		if (m->Rep.matches[m->Rep.nmatches-1]->type == NOMATCH) {
+			m->Rep.nmatches--;
+			free(m->Rep.matches[m->Rep.nmatches]);
+			if (m->Rep.nmatches >= m->spec->Rep.min) {  // We've got enough
+				DEBUGLOG7(" ## Matching MRep (with %d matches) at %d\n", m->Rep.nmatches, m->Rep.matches[m->Rep.nmatches-1]->end);
+				if (m->Rep.nmatches == 0) {
+					m->end = m->start;
+					return;
+				}
+				return LTM_succeed_MRep(m);
+			}
 			if (m->Rep.nmatches == 0) {  // All the way left
 				DEBUGLOG7(" ## Not matching MRep (Out of tokens to backtrack)\n");
 				return LTM_fail_MRep(m);
-			}
-			m->Rep.nmatches--;
-			free(m->Rep.matches[m->Rep.nmatches]);
-			if (m->Rep.nmatches == 0) {
-				DEBUGLOG7(" ## Matching MRep (with 0 matches) at %d\n", m->start);
-				m->end = m->start;
-				return;
-			}
-			if (m->Rep.nmatches >= m->spec->Rep.min) {  // We've got enough
-				DEBUGLOG7(" ## Matching MRep (with %d matches) at %d\n", m->Rep.nmatches, m->Rep.matches[m->Rep.nmatches-1]->end);
-				return LTM_succeed_MRep(m);
 			}
 			LTM_backtrack(m->Rep.matches[m->Rep.nmatches-1], str, scope);
 		}  // If child did match, advance right
