@@ -25,6 +25,5 @@ Refactor code into flat layout?
    (breaking apart into nodes/* may have been a mistake)
 Implement MLongest
  -- And change acronym :)
-
-
-
+Make MRep use linked list instead of variable pointer array.
+Take str out of argument list, as it generally stays the same.
