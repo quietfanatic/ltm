@@ -58,12 +58,12 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 		MATCH_TO(pos); \
 	} \
 	MATCH_FAIL
-#define ALLOC_MATCH(pointer) \
-	(pointer) = malloc(sizeof(Match)); \
-	if (!(pointer)) die("Error: failed to malloc(%s)", #pointer)
-#define MATCH_RECURSE(newm, newspec, newstart) \
-		LTM_init_Match(newm, newspec, newstart); \
-		LTM_start(newm, str, scope)
+#define ALLOC_CHK(pointer, size) \
+	(pointer) = malloc(size); \
+	if (!(pointer)) die("Error: failed to malloc %s", #pointer)
+#define MATCH_REC(newm, newspec, newstart) \
+	LTM_init_Match(newm, newspec, newstart); \
+	LTM_start(newm, str, scope)
 
 #include "nodes/MAny.h"
 #include "nodes/MChar.h"
@@ -77,17 +77,6 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 #include "nodes/MCap&co.h"
 #include "nodes/MRef.h"
 
-// On match success:
-//     DEBUGLOG()
-//     make sure .nmatches (or such) is set correctly
-//     set .end
-//     return
-// On match failure:
-//     DEBUGLOG()
-//     free any used memory
-//         destroy_match() need not be called, as all inner nodes will already be NOMATCH.
-//     set .type to NOMATCH
-//     return
 
 
 Match LTM_match_at (MSpec* spec, MStr_t str, size_t start) {
@@ -146,10 +135,21 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 			MATCH_TO_IF(MStr_after(str, m->start), m->spec->CharClass.negative);
 		}
 
-		case MGROUP:     return LTM_start_MGroup(m, str, scope);
+		case MGROUP: {
+			m->Group.nelements = m->spec->Group.nelements;
+			if (m->Group.nelements == 0) {
+				m->type = MNULL;
+				MATCH_TO(m->start);
+			}
+			ALLOC_CHK(m->Group.elements, m->Group.nelements * sizeof(Match));
+			MATCH_REC(&m->Group.elements[0], &m->spec->Group.elements[0], m->start);
+			LTM_walk_MGroup(m, str, scope, 0);
+			return;
+		}
+
 		case MOPT: {
-			ALLOC_MATCH(m->Opt.possible);
-			MATCH_RECURSE(m->Opt.possible, m->spec->Opt.possible, m->start);
+			ALLOC_CHK(m->Opt.possible, sizeof(Match));
+			MATCH_REC(m->Opt.possible, m->spec->Opt.possible, m->start);
 			if (m->Opt.possible->type == NOMATCH) {
 				free(m->Opt.possible);
 				m->type = MNULL;
@@ -158,7 +158,17 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 			MATCH_TO(m->Opt.possible->end);
 		}
 
-		case MALT:       return LTM_start_MAlt(m, str, scope);
+		case MALT: {
+			ALLOC_CHK(m->Alt.matched, sizeof(Match));
+			for (m->Alt.alti = 0; m->Alt.alti < m->spec->Alt.nalts; m->Alt.alti++) {
+				MATCH_REC(m->Alt.matched, &m->spec->Alt.alts[m->Alt.alti], m->start);
+				if (m->Alt.matched->type != NOMATCH) {
+					MATCH_TO(m->Alt.matched->end);
+				}
+			}  // None matched (An empty Alt always fails, too)
+			free(m->Alt.matched);
+			MATCH_FAIL;
+		}
 		case MREP:       return LTM_start_MRep(m, str, scope);
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
 		case MCAP:       return LTM_start_MCap(m, str, scope);
