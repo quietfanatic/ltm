@@ -58,9 +58,12 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 		MATCH_TO(pos); \
 	} \
 	MATCH_FAIL
-
-
-
+#define ALLOC_MATCH(pointer) \
+	(pointer) = malloc(sizeof(Match)); \
+	if (!(pointer)) die("Error: failed to malloc(%s)", #pointer)
+#define MATCH_RECURSE(newm, newspec, newstart) \
+		LTM_init_Match(newm, newspec, newstart); \
+		LTM_start(newm, str, scope)
 
 #include "nodes/MAny.h"
 #include "nodes/MChar.h"
@@ -106,29 +109,22 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 			MATCH_TO(m->start);
 		}
 		case MBEGIN: {
-			if (MStr_begin_at(str, m->start)) {
-				MATCH_TO(m->start);
-			}
-			MATCH_FAIL;
+			MATCH_TO_IF(m->start, MStr_begin_at(str, m->start));
 		}
 		case MEND: {
-			if (MStr_end_at(str, m->start)) {
-				MATCH_TO(m->start);
-			}
-			MATCH_FAIL;
+			MATCH_TO_IF(m->start, MStr_end_at(str, m->start));
 		}
 		case MANY: {
-			if (MStr_end_at(str, m->start)) {
-				MATCH_FAIL;
-			}
-			MATCH_TO(MStr_after(str, m->start));
+			MATCH_TO_IF(
+				MStr_after(str, m->start),
+				!MStr_end_at(str, m->start)
+			);
 		}
 		case MCHAR: {
-			if (MStr_at(str, m->start) == m->spec->Char.c) {
-				m->end = MStr_after(str, m->start);
-				MATCH_TO(MStr_after(str, m->start));
-			}
-			MATCH_FAIL;
+			MATCH_TO_IF(
+				MStr_after(str, m->start),
+				MStr_at(str, m->start) == m->spec->Char.c
+			);
 		}
 
 		case MCHARCLASS: {
@@ -151,7 +147,17 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		}
 
 		case MGROUP:     return LTM_start_MGroup(m, str, scope);
-		case MOPT:       return LTM_start_MOpt(m, str, scope);
+		case MOPT: {
+			ALLOC_MATCH(m->Opt.possible);
+			MATCH_RECURSE(m->Opt.possible, m->spec->Opt.possible, m->start);
+			if (m->Opt.possible->type == NOMATCH) {
+				free(m->Opt.possible);
+				m->type = MNULL;
+				MATCH_TO(m->start);
+			}
+			MATCH_TO(m->Opt.possible->end);
+		}
+
 		case MALT:       return LTM_start_MAlt(m, str, scope);
 		case MREP:       return LTM_start_MRep(m, str, scope);
 		case MSCOPE:     return LTM_start_MScope(m, str, scope);
