@@ -29,8 +29,11 @@ void LTM_abort (Match* m, MStr_t str, Match* scope);
 
 
 
-void die (char* mess) {
-	fputs(mess, stderr);
+void die (char* mess, ...) {
+	va_list va;
+	va_start(va, mess);
+	vfprintf(stderr, mess, va);
+	va_end(va);
 	abort();
 }
 
@@ -41,6 +44,16 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 	m->start = start;
 	return;
 }
+
+#define MATCH_SUCCEED \
+	DEBUGLOG7(" ## %s success\n", LTM_MType[m->type]); \
+	return
+#define MATCH_FAIL \
+	m->type = NOMATCH; \
+	DEBUGLOG7(" ## %s fail\n", LTM_MType[m->type]); \
+	return
+
+
 
 #include "nodes/MAny.h"
 #include "nodes/MChar.h"
@@ -79,14 +92,41 @@ Match LTM_match_at (MSpec* spec, MStr_t str, size_t start) {
 
 
 void LTM_start (Match* m, MStr_t str, Match* scope) {
-	DEBUGLOG10(" ## About to start %s.\n", LTM_MType[m->type]);
+	DEBUGLOG10(" ## %s start.\n", LTM_MType[m->type]);
 	switch (m->type) {
-		case NOMATCH:    return LTM_start_NoMatch(m, str, scope);
-		case MNULL:      return LTM_start_MNull(m, str, scope);
-		case MBEGIN:     return LTM_start_MBegin(m, str, scope);
-		case MEND:       return LTM_start_MEnd(m, str, scope);
-		case MANY:       return LTM_start_MAny(m, str, scope);
-		case MCHAR:      return LTM_start_MChar(m, str, scope);
+		case NOMATCH: return;  // NoMatch doesn't match.
+		case MNULL: {
+			m->end = m->start;
+			MATCH_SUCCEED;
+		}
+		case MBEGIN: {
+			if (MStr_begin_at(str, m->start)) {
+				m->end = m->start;
+				MATCH_SUCCEED;
+			}
+			MATCH_FAIL;
+		}
+		case MEND: {
+			if (MStr_end_at(str, m->start)) {
+				m->end = m->start;
+				MATCH_SUCCEED;
+			}
+			MATCH_FAIL;
+		}
+		case MANY: {
+			if (MStr_end_at(str, m->start)) {
+				MATCH_FAIL;
+			}
+			m->end = MStr_after(str, m->start);
+			MATCH_SUCCEED;
+		}
+		case MCHAR: {
+			if (MStr_at(str, m->start) == m->spec->Char.c) {
+				m->end = MStr_after(str, m->start);
+				MATCH_SUCCEED;
+			}
+			MATCH_FAIL;
+		}
 		case MCHARCLASS: return LTM_start_MCharClass(m, str, scope);
 		case MGROUP:     return LTM_start_MGroup(m, str, scope);
 		case MOPT:       return LTM_start_MOpt(m, str, scope);
@@ -97,8 +137,7 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 		case MNAMECAP:   return LTM_start_MNameCap(m, str, scope);
 		case MREF:       return LTM_start_MRef(m, str, scope);
 		default: {
-			fprintf(stderr, "Error: Tried to match with unknown match type %d.\n", m->type);
-			abort();
+			die("Error: Tried to match with unknown match type %d.\n", m->type);
 		}
 	}
 }
