@@ -45,13 +45,20 @@ static inline void LTM_init_Match (Match* m, MSpec* spec, size_t start) {
 	return;
 }
 
-#define MATCH_SUCCEED \
+#define MATCH_TO(pos) \
 	DEBUGLOG7(" ## %s success\n", LTM_MType[m->type]); \
+	m->end = (pos); \
 	return
 #define MATCH_FAIL \
 	m->type = NOMATCH; \
 	DEBUGLOG7(" ## %s fail\n", LTM_MType[m->type]); \
 	return
+#define MATCH_TO_IF(pos, cond) \
+	if (cond) { \
+		MATCH_TO(pos); \
+	} \
+	MATCH_FAIL
+
 
 
 
@@ -96,20 +103,17 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 	switch (m->type) {
 		case NOMATCH: return;  // NoMatch doesn't match.
 		case MNULL: {
-			m->end = m->start;
-			MATCH_SUCCEED;
+			MATCH_TO(m->start);
 		}
 		case MBEGIN: {
 			if (MStr_begin_at(str, m->start)) {
-				m->end = m->start;
-				MATCH_SUCCEED;
+				MATCH_TO(m->start);
 			}
 			MATCH_FAIL;
 		}
 		case MEND: {
 			if (MStr_end_at(str, m->start)) {
-				m->end = m->start;
-				MATCH_SUCCEED;
+				MATCH_TO(m->start);
 			}
 			MATCH_FAIL;
 		}
@@ -117,17 +121,35 @@ void LTM_start (Match* m, MStr_t str, Match* scope) {
 			if (MStr_end_at(str, m->start)) {
 				MATCH_FAIL;
 			}
-			m->end = MStr_after(str, m->start);
-			MATCH_SUCCEED;
+			MATCH_TO(MStr_after(str, m->start));
 		}
 		case MCHAR: {
 			if (MStr_at(str, m->start) == m->spec->Char.c) {
 				m->end = MStr_after(str, m->start);
-				MATCH_SUCCEED;
+				MATCH_TO(MStr_after(str, m->start));
 			}
 			MATCH_FAIL;
 		}
-		case MCHARCLASS: return LTM_start_MCharClass(m, str, scope);
+
+		case MCHARCLASS: {
+			if (MStr_end_at(str, m->start)) {
+				MATCH_FAIL;
+			}
+			MCharRange* ranges = m->spec->CharClass.ranges;
+			int i;  // We assume the ranges are sorted.
+			for (i=0; i < m->spec->CharClass.nranges; i++) {
+				 // Before this range
+				if (MStr_at(str, m->start) < ranges[i].from) {
+					MATCH_TO_IF(MStr_after(str, m->start), m->spec->CharClass.negative);
+				}
+				 // In this range
+				if (MStr_at(str, m->start) <= ranges[i].to) {
+					MATCH_TO_IF(MStr_after(str, m->start), !m->spec->CharClass.negative);
+				}
+			}  // Out of ranges
+			MATCH_TO_IF(MStr_after(str, m->start), m->spec->CharClass.negative);
+		}
+
 		case MGROUP:     return LTM_start_MGroup(m, str, scope);
 		case MOPT:       return LTM_start_MOpt(m, str, scope);
 		case MALT:       return LTM_start_MAlt(m, str, scope);
